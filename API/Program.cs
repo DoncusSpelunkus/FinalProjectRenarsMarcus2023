@@ -55,8 +55,6 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
 
     cfg.CreateMap<Employee, UserDto>();
     cfg.CreateMap<UserDto, Employee>();
-    cfg.CreateMap<Employee, RegisterDto>();
-    cfg.CreateMap<RegisterDto, Employee>();
     cfg.CreateMap<Employee, UserDto>()
         .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
     cfg.CreateMap<CreateProductLocationDto, ProductLocation>();

@@ -31,11 +31,11 @@ public class UserController : ControllerBase
 
     // [Authorize(Roles = "Admin")]
     [HttpPost("register")]
-    public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
+    public async Task<ActionResult<UserDto>> Register(UserDto receivedUser)
     {
         try
         {
-            var userDto = await _service.CreateEmployee(registerDto);
+            var userDto = await _service.CreateEmployee(receivedUser);
 
             if (userDto == null)
             {

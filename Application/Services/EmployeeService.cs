@@ -16,6 +16,8 @@ namespace Application.Services;
 public class EmployeeService : IEmployeeService
 {
     private readonly LoginValidator _loginVal;
+
+    private readonly UserDtoValidator _userDtoVal;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
@@ -28,27 +30,25 @@ public class EmployeeService : IEmployeeService
         _mapper = mapper;
     }
 
-    public async Task<UserDto> CreateEmployee(RegisterDto registerDto)
+    public async Task<UserDto> CreateEmployee(UserDto userDto)
     {
-        if (await UserExists(registerDto.Username))
+
+
+        if (await UserExists(userDto.Username))
         {
             throw new ApplicationException("User already exists");
         }
 
         using var hmac = new HMACSHA512();
+        
+        var employee = _mapper.Map<Employee>(userDto);
 
-        var user = new Employee
-        {
-            Username = registerDto.Username.ToLower(),
-            Name = registerDto.Name.ToLower(),
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-            PasswordSalt = hmac.Key,
-            Email = registerDto.Email,
-            Role = registerDto.Role,
-            WarehouseId = registerDto.warehouseId
-        };
+        employee.Name = employee.Name.ToLower();
+        employee.Username = employee.Username.ToLower();
+        employee.PasswordHash  = hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password));
+        employee.PasswordSalt = hmac.Key;
 
-        var registeredEmployee = await _employeeRepository.CreateEmployee(user);
+        var registeredEmployee = await _employeeRepository.CreateEmployee(employee);
 
         return _mapper.Map<UserDto>(registeredEmployee);
     }
@@ -67,10 +67,14 @@ public class EmployeeService : IEmployeeService
 
     public async Task<UserDto> UpdateEmployee(UserDto userDto)
     {
+        var validation = _userDtoVal.Validate(userDto);
+
+        if(!validation.IsValid){
+            throw new ApplicationException("Invalid user data: " + validation);
+        }
 
         using var hmac = new HMACSHA512();
         string password = getRandomPassword();
-        Console.WriteLine(password);
         var employee = _mapper.Map<Employee>(userDto);
         employee.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
         employee.PasswordSalt = hmac.Key; 
@@ -111,17 +115,12 @@ public class EmployeeService : IEmployeeService
 
         var token = _tokenService.CreateToken(user);
 
-        return new UserDto
-        {
-            DisplayName = user.Username,
-            Token = token,
-            Role = user.Role,
-            EmployeeId = user.EmployeeId,
-            Username = user.Username,
-            Name = user.Name,
-            Email = user.Email,
-            WarehouseId = user.WarehouseId
-        };
+        var userdto = _mapper.Map<UserDto>(user);
+
+        userdto.Token = token;
+    
+        return userdto;
+
     }
 
     public void CreateDB()
