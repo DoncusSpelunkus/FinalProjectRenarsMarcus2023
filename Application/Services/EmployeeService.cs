@@ -45,13 +45,15 @@ public class EmployeeService : IEmployeeService
         var validation = _userDtoVal.Validate(userDto);
 
         if(!validation.IsValid){
-            throw new ApplicationException("Invalid user data: " + validation.ToString());
+            Console.WriteLine(validation.ToString());
+            throw new ApplicationException("Invalid user data: " + validation);
         }
 
         var passwordValidation = _passwordVal.Validate(userDto);
 
         if(!passwordValidation.IsValid){
-            throw new ApplicationException("Invalid user data: " + validation.ToString());
+            Console.WriteLine(passwordValidation.ToString());
+            throw new ApplicationException("Invalid user data: " + passwordValidation);
         }
 
         using var hmac = new HMACSHA512();
@@ -85,7 +87,7 @@ public class EmployeeService : IEmployeeService
         var validation = _userDtoVal.Validate(userDto);
 
         if(!validation.IsValid){
-            throw new ApplicationException("Invalid user data: " + validation.ToString());
+            throw new ApplicationException("Invalid user data: " + validation);
         }
 
         using var hmac = new HMACSHA512();
@@ -113,7 +115,7 @@ public class EmployeeService : IEmployeeService
 
         if (!validation.IsValid)
         {
-            throw new ApplicationException("Validation failed: " + validation.ToString());
+            throw new ApplicationException("Validation failed: " + validation);
         }
 
         var user = await _employeeRepository.GetUserByUsernameAsync(loginDto.Username);
