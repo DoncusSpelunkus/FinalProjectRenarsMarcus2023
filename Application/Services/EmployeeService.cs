@@ -67,7 +67,13 @@ public class EmployeeService : IEmployeeService
 
     public async Task<UserDto> UpdateEmployee(UserDto userDto)
     {
+
+        using var hmac = new HMACSHA512();
+        string password = getRandomPassword();
+        Console.WriteLine(password);
         var employee = _mapper.Map<Employee>(userDto);
+        employee.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        employee.PasswordSalt = hmac.Key; 
         var updatedEmployee = await _employeeRepository.UpdateEmployee(employee);
         return _mapper.Map<UserDto>(updatedEmployee);
     }
@@ -137,5 +143,52 @@ public class EmployeeService : IEmployeeService
         }
 
         return true;
+    }
+
+    private string getRandomPassword(){
+        int passwordLen = new Random().Next(8, 15);
+        int first = new Random().Next(1, 3);
+        int second = new Random().Next(4, 5);
+        int third = new Random().Next(5, 8);
+        string password = "";
+        char toAdd;
+
+        int lastAdd = 1;
+
+        for (int i = 0; i < passwordLen; i++)
+        {
+
+            toAdd = Convert.ToChar(new Random().Next(0, 26) + 97); // a-z
+            
+            int fiftyfifty = new Random().Next(0, 1);
+
+            if (fiftyfifty == 1 || i == first || i == second || i == third)
+            {
+                if (lastAdd == 1)
+                {
+                    toAdd = Convert.ToChar(new Random().Next(0, 5) + 33); // 33 = '!'
+                }
+
+                if(lastAdd == 2){
+                    toAdd = Convert.ToChar(new Random().Next(0, 26) + 65); // A-Z
+
+                }
+                if(lastAdd == 3){
+                    toAdd = Convert.ToChar(new Random().Next(0, 9) + 48); // 0-9
+                }
+
+                if (lastAdd == 3)
+                {
+                    lastAdd = 1;
+                }
+                else
+                {
+                    lastAdd += 1;
+                }
+            }
+
+            password += toAdd;
+        }
+        return password;
     }
 }

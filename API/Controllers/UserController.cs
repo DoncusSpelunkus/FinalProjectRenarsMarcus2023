@@ -185,7 +185,7 @@ public class UserController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("ReceiveMessage", productLocations);
+            await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("UserListUpdate", productLocations);
         }
         catch (Exception e)
         {
