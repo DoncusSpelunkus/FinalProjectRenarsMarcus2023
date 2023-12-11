@@ -1,0 +1,7 @@
+﻿[
+  { "Name": "Toys", "WarehouseId": 1 },
+  { "Name": "Appliances", "WarehouseId": 1 },
+  { "Name": "Clothing", "WarehouseId": 1 },
+  { "Name": "Furniture", "WarehouseId": 1 },
+  { "Name": "Electronics", "WarehouseId": 1 }
+]

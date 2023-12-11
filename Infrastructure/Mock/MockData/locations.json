@@ -1,0 +1,22 @@
+﻿[
+  {"LocationId": "161-01-01-01", "Aisle": "161", "Rack": "01", "Shelf": "01", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-01-01-02", "Aisle": "161", "Rack": "01", "Shelf": "01", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-01-01-03", "Aisle": "161", "Rack": "01", "Shelf": "01", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-01-02-01", "Aisle": "161", "Rack": "01", "Shelf": "02", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-01-02-02", "Aisle": "161", "Rack": "01", "Shelf": "02", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-01-02-03", "Aisle": "161", "Rack": "01", "Shelf": "02", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-01-03-01", "Aisle": "161", "Rack": "01", "Shelf": "03", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-01-03-02", "Aisle": "161", "Rack": "01", "Shelf": "03", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-01-03-03", "Aisle": "161", "Rack": "01", "Shelf": "03", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-02-01-01", "Aisle": "161", "Rack": "02", "Shelf": "01", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-02-01-02", "Aisle": "161", "Rack": "02", "Shelf": "01", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-02-01-03", "Aisle": "161", "Rack": "02", "Shelf": "01", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-02-02-01", "Aisle": "161", "Rack": "02", "Shelf": "02", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-02-02-02", "Aisle": "161", "Rack": "02", "Shelf": "02", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-02-02-03", "Aisle": "161", "Rack": "02", "Shelf": "02", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-02-03-01", "Aisle": "161", "Rack": "02", "Shelf": "03", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-02-03-02", "Aisle": "161", "Rack": "02", "Shelf": "03", "Bin": "02", "WarehouseId": 1},
+  {"LocationId": "161-02-03-03", "Aisle": "161", "Rack": "02", "Shelf": "03", "Bin": "03", "WarehouseId": 1},
+  {"LocationId": "161-03-01-01", "Aisle": "161", "Rack": "03", "Shelf": "01", "Bin": "01", "WarehouseId": 1},
+  {"LocationId": "161-03-01-02", "Aisle": "161", "Rack": "03", "Shelf": "01", "Bin": "02", "WarehouseId": 1}
+]

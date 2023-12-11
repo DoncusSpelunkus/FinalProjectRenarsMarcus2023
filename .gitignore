@@ -1,0 +1,29 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.FinalExamProject2023.iml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# User specific files
+/Application/obj
+/API/obj
+/Infrastructure/obj
+/Core/obj
+/Tests/obj
+/Tests/bin
+/Core/bin
+/Infrastructure/bin
+/API/bin
+/Application/bin
+.vscode
+
+/API/db.db-shm
+/API/db.db-wal

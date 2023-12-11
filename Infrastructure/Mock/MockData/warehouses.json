@@ -1,0 +1,27 @@
+﻿[
+  {
+    "Name": "Warehouse 1",
+    "Address": "123 Main Street",
+    "Capacity": 1000
+  },
+  {
+    "Name": "Warehouse 2",
+    "Address": "456 Elm Street",
+    "Capacity": 1500
+  },
+  {
+    "Name": "Warehouse 3",
+    "Address": "789 Oak Street",
+    "Capacity": 1200
+  },
+  {
+    "Name": "Warehouse 4",
+    "Address": "101 Pine Street",
+    "Capacity": 800
+  },
+  {
+    "Name": "Warehouse 5",
+    "Address": "222 Cedar Street",
+    "Capacity": 2000
+  }
+]

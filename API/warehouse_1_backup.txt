@@ -1,0 +1,13 @@
+Cardboard Box, A sturdy cardboard box for packing and shipping. Shipping Supplies, 4, 12
+Plastic Bin, A durable plastic storage bin with lid. Storage Solutions, 8, 16
+Metal Toolbox, A heavy-duty metal toolbox with compartments. Tools and Equipment, 9, 18
+Wooden Crate, A rustic wooden crate for decorative purposes. Home Decor, 6, 14
+Plastic Storage Box, A plastic storage box with a clear lid for easy viewing. Storage Solutions, 4, 10
+Aluminum Case, An aluminum case with foam padding for delicate equipment. Professional Equipment, 6, 20
+Cardboard Mailer, A sturdy cardboard mailer for shipping documents. Shipping Supplies, 1, 9
+Tool Bag, A heavy-duty tool bag with multiple pockets. Tools and Equipment, 12, 14
+Plastic Crate, A plastic storage crate with handles. Storage Solutions, 8, 20
+Metal Storage Cabinet, A metal storage cabinet with adjustable shelves. Storage Solutions, 36, 24
+----------------
+
+
