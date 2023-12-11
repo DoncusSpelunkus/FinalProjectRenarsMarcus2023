@@ -1,3 +1,4 @@
+using System.Data;
 using Application.Dtos;
 using FluentValidation;
 
@@ -15,7 +16,7 @@ public class UserDtoValidator : AbstractValidator<UserDto> // Rules for userDTO 
         .EmailAddress().WithMessage("Email address is not valid.");
 
         RuleFor(user => user.Role)
-        .Matches("admin|sales|employee").WithMessage("Role must be valid, either 'admin','sales' or 'employee'.");
+        .Matches("admin|employee|sales").WithMessage("Role must be valid, either 'admin','sales' or 'employee'.");
 
         RuleFor(user => user.WarehouseId)
         .GreaterThan(0).WithMessage("Warehouse ID must be greater than 0.");

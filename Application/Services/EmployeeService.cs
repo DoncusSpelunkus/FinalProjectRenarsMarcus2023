@@ -17,6 +17,7 @@ public class EmployeeService : IEmployeeService
 {
     private readonly LoginValidator _loginVal;
 
+    private readonly PasswordValidator _passwordVal;
     private readonly UserDtoValidator _userDtoVal;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
@@ -27,16 +28,30 @@ public class EmployeeService : IEmployeeService
         _employeeRepository = employeeRepository;
         _tokenService = tokenService;
         _loginVal = new LoginValidator();
+        _passwordVal = new PasswordValidator();
+        _userDtoVal =  new UserDtoValidator();
         _mapper = mapper;
     }
 
     public async Task<UserDto> CreateEmployee(UserDto userDto)
     {
 
-
+        
         if (await UserExists(userDto.Username))
         {
             throw new ApplicationException("User already exists");
+        }
+
+        var validation = _userDtoVal.Validate(userDto);
+
+        if(!validation.IsValid){
+            throw new ApplicationException("Invalid user data: " + validation.ToString());
+        }
+
+        var passwordValidation = _passwordVal.Validate(userDto);
+
+        if(!passwordValidation.IsValid){
+            throw new ApplicationException("Invalid user data: " + validation.ToString());
         }
 
         using var hmac = new HMACSHA512();
@@ -70,7 +85,7 @@ public class EmployeeService : IEmployeeService
         var validation = _userDtoVal.Validate(userDto);
 
         if(!validation.IsValid){
-            throw new ApplicationException("Invalid user data: " + validation);
+            throw new ApplicationException("Invalid user data: " + validation.ToString());
         }
 
         using var hmac = new HMACSHA512();
@@ -98,7 +113,7 @@ public class EmployeeService : IEmployeeService
 
         if (!validation.IsValid)
         {
-            throw new ApplicationException("Validation failed: " + validation);
+            throw new ApplicationException("Validation failed: " + validation.ToString());
         }
 
         var user = await _employeeRepository.GetUserByUsernameAsync(loginDto.Username);
