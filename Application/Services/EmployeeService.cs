@@ -19,13 +19,15 @@ public class EmployeeService : IEmployeeService
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
+    private readonly IEmailService _emailService;
 
-    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper)
+    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper,IEmailService emailService)
     {
         _employeeRepository = employeeRepository;
         _tokenService = tokenService;
         _loginVal = new LoginValidator();
         _mapper = mapper;
+        _emailService = emailService;
     }
 
     public async Task<UserDto> CreateEmployee(RegisterDto registerDto)
@@ -36,6 +38,13 @@ public class EmployeeService : IEmployeeService
         }
 
         using var hmac = new HMACSHA512();
+
+        string email = "renarsmednieks13@gmail.com";
+        string password = registerDto.Password;
+        
+        Console.WriteLine("About to send");
+        
+        _emailService.SendTemporaryCredentials(email,password);
 
         var user = new Employee
         {
