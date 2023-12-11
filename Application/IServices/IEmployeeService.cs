@@ -6,7 +6,7 @@ namespace Application.IServices;
 
 public interface IEmployeeService
 {
-    Task<UserDto> CreateEmployee(RegisterDto registerDto);
+    Task<UserDto> CreateEmployee(UserDto userDto);
     Task<UserDto> GetEmployeeById(int employeeId);
     Task<List<UserDto>> GetEmployeesByWarehouseId(int warehouseId);
     Task<UserDto> UpdateEmployee(UserDto userDto);
