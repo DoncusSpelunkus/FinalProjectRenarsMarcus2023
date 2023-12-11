@@ -12,7 +12,7 @@ namespace Application.Services
         private const string SmtpServer = "smtp.gmail.com";
         private const int SmtpPort = 587;
         private const string SmtpUsername = "WhereHouseIncBusiness@gmail.com"; // Replace with your Gmail address
-        private const string SmtpPassword = "TotallySecurePassword@123"; // Replace with your Gmail password
+        private const string SmtpPassword = "qwce jypp xwqx xicw"; // Replace with your Gmail password
 
         public void SendTemporaryCredentials(string receiverEmail, string password)
         {
@@ -29,7 +29,8 @@ namespace Application.Services
 
             using (var smtp = new SmtpClient())
             {
-                smtp.Connect(SmtpServer,SmtpPort,false);
+                smtp.Connect(SmtpServer, SmtpPort, MailKit.Security.SecureSocketOptions.StartTls);
+
 
                 smtp.Authenticate(SmtpUsername,SmtpPassword);
 
