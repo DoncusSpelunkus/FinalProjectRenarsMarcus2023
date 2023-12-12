@@ -71,7 +71,7 @@ public class LocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<LocationDto>> CreateLocation(LocationDto locationDto)
     {
@@ -97,7 +97,7 @@ public class LocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPut("Update")]
     public async Task<ActionResult<LocationDto>> UpdateLocation(LocationDto locationDto)
     {

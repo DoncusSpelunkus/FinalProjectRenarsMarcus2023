@@ -64,7 +64,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<ProductDto>> CreateProduct(ProductDto productDto)
     {

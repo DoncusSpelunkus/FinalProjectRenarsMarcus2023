@@ -27,7 +27,7 @@ public class ProductLocationController : ControllerBase
 
     // [Authorize]
     [HttpGet("GetByWarehouseId/{id}")]
-    public async Task<ActionResult<ProductLocationDto>> GetProductLocationByWarehouse(int id)
+    public async Task<ActionResult<ProductLocationDto>> GetProductLocationByWarehouse(string id)
     {
         try
         {
@@ -93,17 +93,20 @@ public class ProductLocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPatch("IncreaseQuantity/{productLocationId}/{quantityToAdd}")]
-    public async Task<ActionResult> IncreaseQuantity(int productLocationId, int quantityToAdd)
+    public async Task<ActionResult> IncreaseQuantity(ChangeProductDto changeProductDto)
     {
         try
         {
-            await _productLocationService.IncreaseQuantityAsync(productLocationId, quantityToAdd);
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
-            
-            TriggerGetAllProductLocations(int.Parse(userWarehouseIdClaim!.Value));   
+            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+            changeProductDto.WarehouseId = userWarehouseIdClaim;
+
+            await _productLocationService.IncreaseQuantityAsync(changeProductDto);
+
+            TriggerGetAllProductLocations(userWarehouseIdClaim);   
 
             return Ok();
         }
@@ -113,17 +116,19 @@ public class ProductLocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPatch("DecreaseQuantity/{productLocationId}/{quantityToRemove}")]
-    public async Task<ActionResult> DecreaseQuantity(int productLocationId, int quantityToRemove)
+    public async Task<ActionResult> DecreaseQuantity(ChangeProductDto changeProductDto)
     {
         try
         {
-            await _productLocationService.DecreaseQuantityAsync(productLocationId, quantityToRemove);
+            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+            changeProductDto.WarehouseId = userWarehouseIdClaim;
+
+            await _productLocationService.DecreaseQuantityAsync(changeProductDto);
             
-            TriggerGetAllProductLocations(int.Parse(userWarehouseIdClaim!.Value));   
+            TriggerGetAllProductLocations(userWarehouseIdClaim);   
 
             return Ok();
         }
@@ -135,15 +140,17 @@ public class ProductLocationController : ControllerBase
 
     [Authorize]
     [HttpPatch("MoveQuantity/{productsku}/{sourceProductLocationId}/{destinationProductLocationId}/{quantityToMove}")]
-    public async Task<ActionResult> MoveQuantity(string productsku, string sourceProductLocationId, string destinationProductLocationId, int quantityToMove)
+    public async Task<ActionResult> MoveQuantity(ChangeProductDto changeProductDto)
     {
         try
         {
-            await _productLocationService.MoveQuantityAsync(productsku, sourceProductLocationId, destinationProductLocationId, quantityToMove);
+            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+            changeProductDto.WarehouseId = userWarehouseIdClaim;
+
+            await _productLocationService.MoveQuantityAsync(changeProductDto);
             
-            TriggerGetAllProductLocations(int.Parse(userWarehouseIdClaim!.Value));   
+            TriggerGetAllProductLocations(userWarehouseIdClaim);   
 
             return Ok();
         }

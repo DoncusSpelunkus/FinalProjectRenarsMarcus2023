@@ -78,7 +78,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpGet("GetAllByWareHouseId/{id}")]
     public async Task<ActionResult<List<UserDto>>> GetAllByWareHouseId(int id)
     {
@@ -100,7 +100,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpGet("GetById/{id}")]
     public async Task<ActionResult<UserDto>> GetEmployeeById(int id)
     {
@@ -122,7 +122,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPut("Update")] // Should take an id in param?
     public async Task<ActionResult<UserDto>> UpdateEmployee(UserDto userDto)
     {
@@ -148,7 +148,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("Delete/{id}")]
     public async Task<ActionResult<bool>> DeleteEmployee(int id)
     {

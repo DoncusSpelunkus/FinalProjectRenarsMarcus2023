@@ -46,8 +46,10 @@ public class LogsSocket : Hub
             
             await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
 
+            await Task.Delay(5000);
+            
             var list = await _service.GetLogsByWarehouseAsync(int.Parse(user.FindFirst("warehouseId").Value));
-
+            
             await Clients.Groups("warehouseId").SendAsync("LogsListUpdate", list);
 
         }

@@ -47,10 +47,7 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<ProductLocation, ProductLocationDto>();
     cfg.CreateMap<ProductLocationDto, ProductLocation>();
 
-    cfg.CreateMap<ProductLocation, ProductLocationDto>()
-        .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src => src.LastUpdated.ToString("yyyy-MM-ddTHH:mm:ss.fff")))
-        .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
-        .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));
+    cfg.CreateMap<ProductLocation, ProductLocationDto>();
 
 
     cfg.CreateMap<Employee, UserDto>();
@@ -58,6 +55,7 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<Employee, UserDto>()
         .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
     cfg.CreateMap<CreateProductLocationDto, ProductLocation>();
+
 
     cfg.CreateMap<Shipment, ShipmentDto>()
         .ForMember(dest => dest.ShipmentDetails, opt => opt.MapFrom(src => src.ShipmentDetails));
@@ -70,8 +68,11 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<Brand, BrandDto>();
     cfg.CreateMap<BrandDto, Brand>();
 
-    cfg.CreateMap<Log, LogDto>();
-    cfg.CreateMap<LogDto, Log>();
+    cfg.CreateMap<MoveLog, MoveLogDto>();
+    cfg.CreateMap<MoveLogDto, MoveLog>();
+
+    cfg.CreateMap<AdminLog, MoveLogDto>();
+    cfg.CreateMap<MoveLogDto, AdminLog>();
 
     cfg.CreateMap<Warehouse, WarehouseDto>();
     cfg.CreateMap<WarehouseDto, Warehouse>();
