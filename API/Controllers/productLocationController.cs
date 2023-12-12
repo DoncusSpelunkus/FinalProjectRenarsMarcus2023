@@ -46,7 +46,7 @@ public class ProductLocationController : ControllerBase
         }
     }
 
-    // [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<ProductLocationDto>> CreateProductLocation(CreateProductLocationDto createProductLocationDto)
     {
