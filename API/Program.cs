@@ -96,9 +96,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 var path = context.HttpContext.Request.Path;
 
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    (path.StartsWithSegments("/SocketInventory"))
-                    || (path.StartsWithSegments("/SocketUserManagement")))
+                if (
+                    !string.IsNullOrEmpty(accessToken) 
+                    && path.StartsWithSegments("/SocketInventory")
+                    || path.StartsWithSegments("/SocketUserManagement")
+                    || path.StartsWithSegments("/SocketShipments")
+                    )
 
                 {
                     context.Token = accessToken;
@@ -155,5 +158,6 @@ app.MapControllers();
 
 app.MapHub<InventorySocket>("/SocketInventory").RequireAuthorization();
 app.MapHub<UserManagementSocket>("/SocketUserManagement").RequireAuthorization();
+app.MapHub<ShipmentSocket>("/SocketShipment").RequireAuthorization();
 
 await app.RunAsync();
