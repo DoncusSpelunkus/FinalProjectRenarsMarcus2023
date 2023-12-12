@@ -26,6 +26,10 @@ public class DbContextManagement : DbContext
             .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<Location>()
+            .Property(e => e.LocationId)
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Location>()
             .HasOne(l => l.Warehouse)
             .WithMany(w => w.Locations)
             .HasForeignKey(l => l.WarehouseId);
