@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Config;
 
-public class LogConfiguration : IEntityTypeConfiguration<Log>
+public class LogConfiguration : IEntityTypeConfiguration<MoveLog>
 {
-    public void Configure(EntityTypeBuilder<Log> builder)
+    public void Configure(EntityTypeBuilder<MoveLog> builder)
     {
         builder.Property(l => l.ProductSKU).IsRequired();
         builder.Property(l => l.FromLocationId).IsRequired();

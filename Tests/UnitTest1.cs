@@ -19,14 +19,14 @@ public class UnitTest1
     public async Task ShouldCreateEmployeeAndReturnUserDtoAndCheckIfUserDoesNotExist()
     {
         // Arrange
-        var registerDto = new RegisterDto
+        var registerDto = new UserDto
         {
             Username = "testuser",
             Password = "password123",
             Name = "Samkaxe",
             Email = "Samkaxe@gmail.com",
             Role = "standard",
-            warehouseId = 1
+            WarehouseId = 1
         };
 
         var employee = new Employee
@@ -38,7 +38,7 @@ public class UnitTest1
             PasswordSalt = new byte[128],
             Email = registerDto.Email,
             Role = registerDto.Role,
-            WarehouseId = registerDto.warehouseId
+            WarehouseId = registerDto.WarehouseId
         };
 
         var employeeRepositoryMock = new Mock<IEmployeeRepository>();

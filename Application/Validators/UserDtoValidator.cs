@@ -1,7 +1,6 @@
 using System.Data;
 using Application.Dtos;
 using FluentValidation;
-using Application.Helpers;
 
 namespace Application.Validators;
 

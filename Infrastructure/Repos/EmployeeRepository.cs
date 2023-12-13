@@ -149,6 +149,7 @@ public class EmployeeRepository : IEmployeeRepository
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             throw new ApplicationException("something went wrong while seeding ");
         }
     }

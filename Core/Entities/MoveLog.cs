@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Entities;
 
-public class Log
+public class MoveLog
 {
     //  todo : we need three methods one goes for the api ( fetch logs ) , and two for the application layer delete logs after 1 year , create logs 
     [Key]

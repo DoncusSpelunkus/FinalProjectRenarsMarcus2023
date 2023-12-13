@@ -14,16 +14,29 @@ public class LogRepository : ILogRepository
         _context = context;
     }
 
-    public async Task<List<Log>> GetLogsByWarehouseAsync(int warehouseId)
+    public async Task<List<MoveLog>> GetLogsByWarehouseAsync(int warehouseId)
     {
-        return await _context.Logs
+        return await _context.MoveLogs
             .Where(log => log.WarehouseId == warehouseId)
             .ToListAsync();
     }
 
-    public async Task<Log> CreateLogAsync(Log log)
+    public async Task<List<AdminLog>> GetAdminLogsByWarehouseAsync(int warehouseId)
     {
-        _context.Logs.Add(log);
+        return await _context.AdminLogs
+            .Where(log => log.WarehouseId == warehouseId)
+            .ToListAsync();
+    }
+
+    public async Task<AdminLog> CreateAdminLogAsync(AdminLog log)
+    {
+        _context.AdminLogs.Add(log);
+        await _context.SaveChangesAsync();
+        return log;
+    }
+    public async Task<MoveLog> CreateLogAsync(MoveLog log)
+    {
+        _context.MoveLogs.Add(log);
         await _context.SaveChangesAsync();
         return log;
     }
@@ -31,13 +44,13 @@ public class LogRepository : ILogRepository
     public async Task<bool> DeleteLogsOlderThanOneYearAsync()
     {
         var oneYearAgo = DateTime.UtcNow.AddYears(-1);
-        var logsToDelete = await _context.Logs
+        var logsToDelete = await _context.MoveLogs
             .Where(log => log.Timestamp < oneYearAgo)
             .ToListAsync();
 
         if (logsToDelete.Any())
         {
-            _context.Logs.RemoveRange(logsToDelete);
+            _context.MoveLogs.RemoveRange(logsToDelete);
             await _context.SaveChangesAsync();
             return true;
         }

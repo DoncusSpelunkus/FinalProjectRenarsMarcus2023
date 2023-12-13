@@ -4,7 +4,9 @@ namespace Application.InfraInterfaces;
 
 public interface ILogRepository
 {
-    Task<List<Log>> GetLogsByWarehouseAsync(int warehouseId);
-    Task<Log> CreateLogAsync(Log log);
+    Task<List<MoveLog>> GetLogsByWarehouseAsync(int warehouseId);
+    Task<MoveLog> CreateLogAsync(MoveLog log);
     Task<bool> DeleteLogsOlderThanOneYearAsync();
+    Task<AdminLog> CreateAdminLogAsync(AdminLog log);
+    Task<List<AdminLog>> GetAdminLogsByWarehouseAsync(int warehouseId);
 }

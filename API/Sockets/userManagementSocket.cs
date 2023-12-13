@@ -26,10 +26,10 @@ public class UserManagementSocket : Hub // Simple hub that automatically adds us
             {
                 var user = Context.User;
 
-                if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+                if (user!.Identity!.IsAuthenticated) // Ensures that the user is authenticated
                 {
                     var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
-                    if (role != "Admin")
+                    if (role != "sales" && role != "admin")
                     {
                         await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
                         return;
@@ -59,7 +59,7 @@ public class UserManagementSocket : Hub // Simple hub that automatically adds us
     }
 
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         try
         {
@@ -91,7 +91,7 @@ public class UserManagementSocket : Hub // Simple hub that automatically adds us
         if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
         {
             var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
-            if (role != "Admin")
+            if (role != "sales" && role != "admin")
             {
                 await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
                 return;

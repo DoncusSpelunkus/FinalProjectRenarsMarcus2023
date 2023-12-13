@@ -31,30 +31,47 @@ public class ProductLocationService : IProductLocationService
             return _mapper.Map<List<ProductLocationDto>>(productLocations);
         }
 
-        public async Task<ProductLocationDto> GetProductLocationAsync(int productLocationId)
+        public async Task<ProductLocationDto> GetProductLocationAsync(string productLocationId)
         {
             var productLocation = await _productLocationRepository.GetProductLocationAsync(productLocationId);
             return _mapper.Map<ProductLocationDto>(productLocation);
         }
 
-        public async Task IncreaseQuantityAsync(int productLocationId, int quantityToAdd)
-        {
-            await _productLocationRepository.IncreaseQuantityAsync(productLocationId, quantityToAdd);
+        public async Task IncreaseQuantityAsync(ChangeProductDto changeProductDto)
+        {   
+            await MakeAdminLog(changeProductDto, DateTime.Now);
+
+            await _productLocationRepository.IncreaseQuantityAsync(changeProductDto.SourcePLocationId, changeProductDto.Quantity);
         }
 
-        public async Task DecreaseQuantityAsync(int productLocationId, int quantityToRemove)
-        {
-            await _productLocationRepository.DecreaseQuantityAsync(productLocationId, quantityToRemove);
+        public async Task DecreaseQuantityAsync(ChangeProductDto changeProductDto)
+        {   
+            await MakeAdminLog(changeProductDto, DateTime.Now);
+
+            await _productLocationRepository.DecreaseQuantityAsync(changeProductDto.SourcePLocationId, changeProductDto.Quantity);
         }
 
-        public async Task MoveQuantityAsync(string productSKU, string sourceLocationId, string destinationLocationId, int quantityToMove)
+        public async Task MoveQuantityAsync(ChangeProductDto changeProductDto)
         {
-            await _productLocationRepository.MoveQuantityAsync(productSKU ,sourceLocationId, destinationLocationId, quantityToMove);
+            await _productLocationRepository.MoveQuantityAsync(changeProductDto.ProductSKU, changeProductDto.SourcePLocationId, changeProductDto.DestinationPLocationId, changeProductDto.Quantity);
+
+            await _logRepository.CreateLogAsync(new MoveLog
+            {
+                ProductSKU = changeProductDto.ProductSKU,
+                FromLocationId = changeProductDto.SourcePLocationId,
+                ToLocationId = changeProductDto.DestinationPLocationId,
+                Quantity = changeProductDto.Quantity,
+                Timestamp = DateTime.Now,
+                WarehouseId = changeProductDto.WarehouseId,
+                UserId = changeProductDto.EmployeeId
+            });
         }
 
-        public async Task UpdateLastUpdatedAsync(int productLocationId, DateTime lastUpdated)
+        public async Task UpdateLastUpdatedAsync(ChangeProductDto changeProductDto, DateTime lastUpdated)
         {
-            await _productLocationRepository.UpdateLastUpdatedAsync(productLocationId, lastUpdated);
+            await MakeAdminLog(changeProductDto, DateTime.Now);
+
+            await _productLocationRepository.UpdateLastUpdatedAsync(changeProductDto.SourcePLocationId, lastUpdated);
         }
 
         public async Task<ProductLocationDto> CreateProductLocationAsync(CreateProductLocationDto createProductLocationDto)
@@ -73,28 +90,36 @@ public class ProductLocationService : IProductLocationService
             return _mapper.Map<ProductLocationDto>(createdProductLocation);
         }
 
-        public async Task<List<LogDto>> GetLogsByWarehouseAsync(int warehouseId)
-        {
-            var logs = await _logRepository.GetLogsByWarehouseAsync(warehouseId);
-            return _mapper.Map<List<LogDto>>(logs);
-        }
-
-        public async Task<LogDto> CreateLogAsync(LogDto createLogDto)
-        {
-            
-            var logEntity = _mapper.Map<Log>(createLogDto);
-            
-            var createdLogEntity = await _logRepository.CreateLogAsync(logEntity);
-            
-            var createdLogDto = _mapper.Map<LogDto>(createdLogEntity);
-            
-            return createdLogDto;
-        }
 
         public async Task<bool> DeleteLogsOlderThanOneYearAsync()
         {
             var success = await _logRepository.DeleteLogsOlderThanOneYearAsync();
             Console.WriteLine(success);
             return success;
+        }
+
+         public async Task<List<MoveLogDto>> GetLogsByWarehouseAsync(int warehouseId)
+        {
+            
+            var logs = await _logRepository.GetLogsByWarehouseAsync(warehouseId);
+            return _mapper.Map<List<MoveLogDto>>(logs);
+        }
+
+        public async Task<List<MoveLogDto>> GetAdminLogsByWarehouseAsync(int warehouseId)
+        {
+            var logs = await _logRepository.GetAdminLogsByWarehouseAsync(warehouseId);
+            return _mapper.Map<List<MoveLogDto>>(logs);
+        }
+
+        private async Task MakeAdminLog(ChangeProductDto changeProductDto, DateTime timestamp){
+            await _logRepository.CreateAdminLogAsync(new AdminLog
+            {
+                ProductSKU = changeProductDto.ProductSKU,
+                ProductlocationId = changeProductDto.SourcePLocationId,
+                QuantityChange = changeProductDto.Quantity,
+                Timestamp =  timestamp,
+                WarehouseId = changeProductDto.WarehouseId,
+                EmployeeId = changeProductDto.EmployeeId
+            });
         }
     }
