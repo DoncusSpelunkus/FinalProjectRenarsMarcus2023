@@ -25,8 +25,8 @@ public class Logscontroller : ControllerBase
 
     }
 
-    [Authorize]
-    [HttpGet("getAllMovelogs/{warehouseId}")]
+    [Authorize(Roles = "admin")]
+    [HttpGet("GetAllLogs/{warehouseId}")]
     public async Task<ActionResult<List<MoveLogDto>>> GetLog(int warehouseId)
     {
         try
@@ -48,46 +48,6 @@ public class Logscontroller : ControllerBase
             } 
 
             var log = await _productLocationService.GetLogsByWarehouseAsync(warehouseId);
-
-            if (log == null)
-            {
-                return BadRequest("Log not found");
-            }
-            
-            return log;
-
-
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error in GetLog" + e);
-            return BadRequest(e.Message);
-        }
-    }
-
-    [Authorize(Roles = "admin")]
-    [HttpGet("getAllAdminLogs/{warehouseId}")]
-    public async Task<ActionResult<List<MoveLogDto>>> GetLogAdmin(int warehouseId)
-    {
-        try
-        {
-            
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId"); // Ensures that the user is from the proper warehouse
-
-            if (userWarehouseIdClaim  == null || !int.TryParse(userWarehouseIdClaim .Value, out var userWarehouseId))
-            {  
-                Console.WriteLine("User not authorized, step 1");
-                return Forbid();
-                
-            }
-
-            if (userWarehouseId != warehouseId)
-            {
-                Console.WriteLine("User not authorized, step 2");
-                return Forbid();
-            } 
-
-            var log = await _productLocationService.GetAdminLogsByWarehouseAsync(warehouseId);
 
             if (log == null)
             {

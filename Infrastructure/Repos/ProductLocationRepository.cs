@@ -32,7 +32,7 @@ public class ProductLocationRepository : IProductLocationRepository
             .SingleOrDefaultAsync(pl => pl.ProductLocationId == productLocationId);
     }
 
-    public async Task IncreaseQuantityAsync(string productLocationId, int quantityToAdd)
+    public async Task ChangeQuantity(string productLocationId, int quantityToAdd)
     {
         var productLocation = await GetProductLocationAsync(productLocationId);
 
@@ -43,16 +43,6 @@ public class ProductLocationRepository : IProductLocationRepository
         }
     }
 
-    public async Task DecreaseQuantityAsync(string productLocationId, int quantityToRemove)
-    {
-        var productLocation = await GetProductLocationAsync(productLocationId);
-
-        if (productLocation != null)
-        {
-            productLocation.Quantity -= quantityToRemove;
-            await _context.SaveChangesAsync();
-        }
-    }
 
     public async Task MoveQuantityAsync(string productSKU, string sourceLocationId, string destinationLocationId, int quantityToMove)
     {

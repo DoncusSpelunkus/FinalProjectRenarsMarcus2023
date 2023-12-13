@@ -27,11 +27,11 @@ public class ProductLocationController : ControllerBase
 
     // [Authorize]
     [HttpGet("GetByWarehouseId/{id}")]
-    public async Task<ActionResult<ProductLocationDto>> GetProductLocationByWarehouse(string id)
+    public async Task<ActionResult<List<ProductLocationDto>>> GetProductLocationByWarehouse(int id)
     {
         try
         {
-            var productLocation = await _productLocationService.GetProductLocationAsync(id);
+            var productLocation = await _productLocationService.GetProductLocationsByWarehouseAsync(id);
 
             if (productLocation == null)
             {
@@ -94,7 +94,7 @@ public class ProductLocationController : ControllerBase
     }
 
     [Authorize(Roles = "admin")]
-    [HttpPatch("IncreaseQuantity/{productLocationId}/{quantityToAdd}")]
+    [HttpPatch("ChangeQuantity/{productLocationId}/{quantityToAdd}")]
     public async Task<ActionResult> IncreaseQuantity(ChangeProductDto changeProductDto)
     {
         try
@@ -104,30 +104,8 @@ public class ProductLocationController : ControllerBase
 
             changeProductDto.WarehouseId = userWarehouseIdClaim;
 
-            await _productLocationService.IncreaseQuantityAsync(changeProductDto);
+            await _productLocationService.ChangeQuantity(changeProductDto);
 
-            TriggerGetAllProductLocations(userWarehouseIdClaim);   
-
-            return Ok();
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }
-
-    [Authorize(Roles = "admin")]
-    [HttpPatch("DecreaseQuantity/{productLocationId}/{quantityToRemove}")]
-    public async Task<ActionResult> DecreaseQuantity(ChangeProductDto changeProductDto)
-    {
-        try
-        {
-            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-            changeProductDto.WarehouseId = userWarehouseIdClaim;
-
-            await _productLocationService.DecreaseQuantityAsync(changeProductDto);
-            
             TriggerGetAllProductLocations(userWarehouseIdClaim);   
 
             return Ok();

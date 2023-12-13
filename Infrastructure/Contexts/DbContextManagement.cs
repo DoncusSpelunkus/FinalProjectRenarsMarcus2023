@@ -49,18 +49,18 @@ public class DbContextManagement : DbContext
             .WithMany(w => w.Products)
             .HasForeignKey(p => p.WarehouseId);
 
-        modelBuilder.Entity<MoveLog>()
+        modelBuilder.Entity<Log>()
             .HasOne(l => l.Employee)
-            .WithMany(e => e.MoveLogs)
+            .WithMany(e => e.Logs)
             .HasForeignKey(l => l.UserId);
         
-        modelBuilder.Entity<MoveLog>()
+        modelBuilder.Entity<Log>()
             .Property(e => e.LogId)
             .ValueGeneratedOnAdd();
 
-        modelBuilder.Entity<MoveLog>()
+        modelBuilder.Entity<Log>()
             .HasOne(l => l.Product)
-            .WithMany(p => p.MoveLogs)
+            .WithMany(p => p.Logs)
             .HasForeignKey(l => l.ProductSKU);
 
         // // Define the relationship between Log and Location for both from and to locations
@@ -155,27 +155,6 @@ public class DbContextManagement : DbContext
             .HasForeignKey(tm => tm.EmployeeId)
             .IsRequired();
 
-        modelBuilder.Entity<AdminLog>()
-            .Property(pt => pt.AdminLogId)
-            .ValueGeneratedOnAdd();
-
-        modelBuilder.Entity<AdminLog>()
-            .HasOne(pt => pt.Warehouse)
-            .WithMany(w => w.AdminLogs)
-            .HasForeignKey(pt => pt.WarehouseId)
-            .IsRequired();
-
-        modelBuilder.Entity<AdminLog>()
-            .HasOne(pt => pt.Employee)
-            .WithMany(e => e.AdminLogs)
-            .HasForeignKey(pt => pt.EmployeeId)
-            .IsRequired();
-
-        modelBuilder.Entity<AdminLog>()
-            .HasOne(pt => pt.Product)
-            .WithMany(p => p.AdminLogs)
-            .HasForeignKey(pt => pt.ProductSKU)
-            .IsRequired();
         
        // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
        // we can customize this later 
@@ -187,13 +166,11 @@ public class DbContextManagement : DbContext
      public DbSet<Employee> Employees { get; set; }
      public DbSet<Location> Locations { get; set; }
      public DbSet<Product> Products { get; set; }
-     public DbSet<MoveLog> MoveLogs { get; set; }
+     public DbSet<Log> Logs { get; set; }
      public DbSet<Orders> Orders { get; set; }
      public DbSet<ProductLocation> ProductLocations { get; set; }
      public DbSet<Shipment> Shipments { get; set; }
      public DbSet<ShipmentDetail> ShipmentDetails { get; set; }
      public DbSet<TimeMap> TimeMaps { get; set; } 
-
-     public DbSet<AdminLog> AdminLogs { get; set; }
      
 }

@@ -25,9 +25,7 @@ public class Product
     public Brand Brand { get; set; }
     public ProductType ProductType { get; set; }
     public Warehouse Warehouse { get; set; }
-    public IEnumerable<MoveLog> MoveLogs { get; set; }
+    public IEnumerable<Log> Logs { get; set; }
     public IEnumerable<ProductLocation> ProductLocations { get; set; }
     public IEnumerable<ShipmentDetail> ShipmentDetails { get; set; }
-
-    public IEnumerable<AdminLog> AdminLogs { get; set; }
 }

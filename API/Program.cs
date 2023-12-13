@@ -68,11 +68,9 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<Brand, BrandDto>();
     cfg.CreateMap<BrandDto, Brand>();
 
-    cfg.CreateMap<MoveLog, MoveLogDto>();
-    cfg.CreateMap<MoveLogDto, MoveLog>();
+    cfg.CreateMap<Log, MoveLogDto>();
+    cfg.CreateMap<MoveLogDto, Log>();
 
-    cfg.CreateMap<AdminLog, MoveLogDto>();
-    cfg.CreateMap<MoveLogDto, AdminLog>();
 
     cfg.CreateMap<Warehouse, WarehouseDto>();
     cfg.CreateMap<WarehouseDto, Warehouse>();

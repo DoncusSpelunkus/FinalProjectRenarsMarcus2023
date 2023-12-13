@@ -18,7 +18,6 @@ public class Employee
     
     public Warehouse Warehouse { get; set; }
     public int WarehouseId { get; set; }
-    public IEnumerable<MoveLog> MoveLogs { get; set; }
+    public IEnumerable<Log> Logs { get; set; }
 
-    public IEnumerable<AdminLog> AdminLogs { get; set; }
 }
