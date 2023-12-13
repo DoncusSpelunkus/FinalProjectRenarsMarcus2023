@@ -1,4 +1,5 @@
 ﻿using Application.InfraInterfaces;
+using AutoMapper.Execution;
 using Core.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
@@ -24,80 +25,89 @@ public class ProductLocationRepository : IProductLocationRepository
             .ToListAsync();
     }
 
-    public async Task<ProductLocation> GetProductLocationAsync(string productLocationId)
-    {
-        return await _context.ProductLocations
-            .Include(pl => pl.Product)  // Include the Product related entity
-            .Include(pl => pl.Location) // Include the Location related entity
-            .SingleOrDefaultAsync(pl => pl.ProductLocationId == productLocationId);
-    }
 
     public async Task ChangeQuantity(string productLocationId, int quantityToAdd)
     {
-        var productLocation = await GetProductLocationAsync(productLocationId);
 
-        if (productLocation != null)
+
+        var productLocation = await _context.ProductLocations
+         .Where(pl => pl.ProductLocationId == productLocationId)
+         .Include(pl => pl.Product)
+         .Include(pl => pl.Location)
+         .FirstOrDefaultAsync() ?? throw new ApplicationException("Source location does not exist");
+
+        productLocation.Quantity += quantityToAdd;
+
+        _context.Entry(productLocation).State = EntityState.Modified;
+
+        try
         {
-            productLocation.Quantity += quantityToAdd;
+            Console.WriteLine(_context.Entry(productLocation).State);
             await _context.SaveChangesAsync();
         }
+        catch (DbUpdateException ex)
+        {
+
+            var innerException = ex.InnerException;
+
+            Console.WriteLine(innerException);
+            Console.WriteLine(innerException?.Message);
+        }
+
     }
 
 
-    public async Task MoveQuantityAsync(string productSKU, string sourceLocationId, string destinationLocationId, int quantityToMove)
+    public async Task MoveToExistingLocationAsync(string sourceLocationId, string destinationLocationId, int quantityToMove)
     {
         var sourceProductLocation = await _context.ProductLocations
-            .FirstOrDefaultAsync(pl => pl.ProductSKU == productSKU && pl.LocationId == sourceLocationId);
-
-        Console.WriteLine(sourceProductLocation.LocationId);
-        Console.WriteLine(sourceProductLocation.Location.LocationId);
-        Console.WriteLine(sourceProductLocation.Quantity);
-        Console.WriteLine(sourceProductLocation.ProductLocationId);
-        Console.WriteLine(sourceProductLocation.Product.SKU);
-        Console.WriteLine(sourceProductLocation.WarehouseId);
-        Console.WriteLine(sourceProductLocation.Warehouse.WarehouseId);
+            .FirstOrDefaultAsync(pl => pl.ProductLocationId == sourceLocationId) ?? throw new ApplicationException("Source location does not exist");
 
         var destinationProductLocation = await _context.ProductLocations
-            .FirstOrDefaultAsync(pl => pl.ProductSKU == productSKU && pl.LocationId == destinationLocationId);
+            .FirstOrDefaultAsync(pl => pl.ProductLocationId == destinationLocationId) ?? throw new ApplicationException("Destination location does not exist");
 
-        if (sourceProductLocation != null)
+
+        if (sourceProductLocation.Quantity - quantityToMove < 0)
         {
-            sourceProductLocation.Quantity -= quantityToMove;
-
-            if (destinationProductLocation != null)
-            {
-                destinationProductLocation.Quantity += quantityToMove;
-            }
-            else
-            {
-                destinationProductLocation = new ProductLocation
-                {
-                    ProductSKU = productSKU,
-                    LocationId = destinationLocationId,
-                    Quantity = quantityToMove,
-                    WarehouseId = sourceProductLocation.WarehouseId, // maybe security issue 
-                    LastUpdated = DateTime.UtcNow // debug here 
-                };
-                Console.WriteLine(destinationProductLocation.LastUpdated);
-                _context.ProductLocations.Add(destinationProductLocation);
-            }
-
-            if (sourceProductLocation.Quantity == 0)
-            {
-                _context.ProductLocations.Remove(sourceProductLocation);
-            }
-
-            await _context.SaveChangesAsync();
+            throw new ApplicationException("Not enough quantity to move, try moving less");
         }
-        else
+
+        sourceProductLocation.Quantity -= quantityToMove;
+
+        destinationProductLocation.Quantity += quantityToMove;
+
+        if (sourceProductLocation.Quantity == 0)
         {
-            Console.WriteLine("something went wrong with method move :(");
+            _context.ProductLocations.Remove(sourceProductLocation);
         }
+
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task MoveToNewLocationAsync(ProductLocation productLocation)
+    {
+        var sourceProductLocation = await _context.ProductLocations
+            .FirstOrDefaultAsync(pl => pl.ProductLocationId == productLocation.ProductLocationId) ?? throw new ApplicationException("Source location does not exist");
+
+        if (sourceProductLocation.Quantity - productLocation.Quantity < 0)
+        {
+            throw new ApplicationException("Not enough quantity to move, try moving less");
+        }
+
+        var destinationProductLocation = await CreateProductLocationAsync(productLocation) ?? throw new ApplicationException("Destination location does not exist");
+
+        sourceProductLocation.Quantity -= productLocation.Quantity;
+
+        if (sourceProductLocation.Quantity == 0)
+        {
+            _context.ProductLocations.Remove(sourceProductLocation);
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateLastUpdatedAsync(string productLocationId, DateTime lastUpdated)
     {
-        var productLocation = await GetProductLocationAsync(productLocationId);
+        var productLocation = await _context.ProductLocations.FindAsync(productLocationId) ?? throw new ApplicationException("Source location does not exist");
 
         if (productLocation != null)
         {
@@ -111,14 +121,29 @@ public class ProductLocationRepository : IProductLocationRepository
     {
         try
         {
-           
-            _context.ProductLocations.Add(productLocation);
-            await _context.SaveChangesAsync();
+            _ = await _context.Locations.Where(l => l.LocationId == productLocation.LocationId).FirstAsync();
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            throw new ApplicationException("Location does not exist");
         }
+
+        try
+        {
+            _ = await _context.Products.Where(p => p.SKU == productLocation.ProductSKU).FirstAsync();
+        }
+        catch (Exception e)
+        {
+            throw new ApplicationException("Product does not exist");
+        }
+
+        _context.ProductLocations.Add(productLocation);
+        await _context.SaveChangesAsync();
         return productLocation;
+    }
+
+    public async Task<ProductLocation> GetProductLocationAsync(string productLocationId)
+    {
+        return await _context.ProductLocations.FindAsync(productLocationId) ?? throw new ApplicationException("Source location does not exist");
     }
 }

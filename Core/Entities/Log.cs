@@ -19,5 +19,4 @@ public class Log
     public DateTime Timestamp { get; set; }
     public int WarehouseId { get; set; }
     public Employee Employee { get; set; }
-    public Product Product { get; set; }
 }

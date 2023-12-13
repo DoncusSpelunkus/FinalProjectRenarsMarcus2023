@@ -65,6 +65,13 @@ public class LocationRepository : ILocationRepository
     }
 
     public async Task<int> getBiggestAisleInt(int warehouseId){
-        return await _context.Locations.Where(l => l.WarehouseId == warehouseId).MaxAsync(l => l.Aisle);
+        try
+        {
+            return await _context.Locations.Where(l => l.WarehouseId == warehouseId).MaxAsync(l => l.Aisle);
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 }
