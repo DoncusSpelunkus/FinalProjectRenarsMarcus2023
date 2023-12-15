@@ -10,4 +10,6 @@ public class MoveLogDto
     public int UserId { get; set; }
     public DateTime Timestamp { get; set; }
     public int WarehouseId { get; set; }
+
+    public string? Type { get; set; }
 }

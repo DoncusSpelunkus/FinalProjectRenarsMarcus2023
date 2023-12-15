@@ -11,5 +11,7 @@ public class Location
     public int Shelf { get; set; }
     public int Bin { get; set; }
     public int WarehouseId { get; set; }
+
+    public ProductLocation ProductLocation { get; set; }
     public Warehouse Warehouse { get; set; }
 }

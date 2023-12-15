@@ -174,6 +174,49 @@ public class UserController : ControllerBase
         }
     }
 
+    [Authorize]
+    [HttpGet("PasswordUpdate/{id}")]
+    public async Task<ActionResult<bool>> PasswordUpdate(int id, string oldPassword, string newPassword)
+    {
+        try
+        {
+            var updated = await _service.UpdatePassword(id, oldPassword, newPassword);
+
+            if (!updated)
+            {
+                return BadRequest("No employee found");
+            }
+
+            return Ok("Password updated");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in PasswordUpdate" + e);
+            return BadRequest(e.Message);
+        }
+    }
+
+   /*[HttpGet("ResetPassword/{id}")]
+    public async Task<ActionResult<bool>> ResetPassword(string email)
+    {
+        try
+        {
+            var updated = await _service.ResetPassword(email);
+
+            if (!updated)
+            {
+                return BadRequest("No employee found");
+            }
+
+            return Ok("Password updated");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in ResetPassword" + e);
+            return BadRequest(e.Message);
+        }
+    }*/
+
     private async void TriggerGetAllUsers(int warehouseId)
     {
         try

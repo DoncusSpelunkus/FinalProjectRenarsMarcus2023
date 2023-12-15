@@ -32,6 +32,13 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
 });
 
+builder.Services.AddLogging(builder =>
+    {
+        builder.AddConsole(); // You can add other logging providers as needed
+        builder.AddDebug();
+    });
+
+
 
 var mapperConfiguration = new MapperConfiguration(cfg =>
 {
@@ -54,7 +61,6 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<UserDto, Employee>();
     cfg.CreateMap<Employee, UserDto>()
         .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-    cfg.CreateMap<CreateProductLocationDto, ProductLocation>();
 
 
     cfg.CreateMap<Shipment, ShipmentDto>()
@@ -68,11 +74,11 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<Brand, BrandDto>();
     cfg.CreateMap<BrandDto, Brand>();
 
-    cfg.CreateMap<MoveLog, MoveLogDto>();
-    cfg.CreateMap<MoveLogDto, MoveLog>();
+    cfg.CreateMap<Log, MoveLogDto>();
+    cfg.CreateMap<MoveLogDto, Log>();
 
-    cfg.CreateMap<AdminLog, MoveLogDto>();
-    cfg.CreateMap<MoveLogDto, AdminLog>();
+    cfg.CreateMap<ProductLocation, ActionDto>();
+    cfg.CreateMap<ActionDto, ProductLocation>();
 
     cfg.CreateMap<Warehouse, WarehouseDto>();
     cfg.CreateMap<WarehouseDto, Warehouse>();

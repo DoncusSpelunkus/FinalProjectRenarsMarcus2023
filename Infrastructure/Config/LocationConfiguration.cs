@@ -13,7 +13,6 @@ public class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.Rack);
         builder.Property(l => l.Shelf);
         builder.Property(l => l.Bin);
-        
         builder.Property(l => l.WarehouseId).IsRequired();
     }
 }

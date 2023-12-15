@@ -49,21 +49,20 @@ public class EmployeeService : IEmployeeService
             throw new ApplicationException("Invalid user data: " + validation);
         }
 
-        var passwordValidation = _passwordVal.Validate(userDto);
+        var passwordValidation = _passwordVal.Validate(userDto.Password);
 
         if(!passwordValidation.IsValid){
             Console.WriteLine(passwordValidation.ToString());
             throw new ApplicationException("Invalid user data: " + passwordValidation);
         }
 
-        using var hmac = new HMACSHA512();
-        
         var employee = _mapper.Map<Employee>(userDto);
 
         employee.Name = employee.Name.ToLower();
         employee.Username = employee.Username.ToLower();
-        employee.PasswordHash  = hmac.ComputeHash(Encoding.UTF8.GetBytes(userDto.Password));
-        employee.PasswordSalt = hmac.Key;
+        var hashAndSalt = CreatePasswordHash(userDto.Password);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
 
         var registeredEmployee = await _employeeRepository.CreateEmployee(employee);
 
@@ -89,12 +88,10 @@ public class EmployeeService : IEmployeeService
         if(!validation.IsValid){
             throw new ApplicationException("Invalid user data: " + validation);
         }
-
-        using var hmac = new HMACSHA512();
-        string password = getRandomPassword();
+        var hashAndSalt = CreatePasswordHash(getRandomPassword());
         var employee = _mapper.Map<Employee>(userDto);
-        employee.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        employee.PasswordSalt = hmac.Key; 
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
         var updatedEmployee = await _employeeRepository.UpdateEmployee(employee);
         return _mapper.Map<UserDto>(updatedEmployee);
     }
@@ -139,6 +136,65 @@ public class EmployeeService : IEmployeeService
         return userdto;
 
     }
+    
+    public async Task<bool> UpdatePassword(int employeeId, string oldPassword, string newPassword)
+    {
+        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
+
+        if (!VerifyPasswordHash(employee, oldPassword))
+        {
+            throw new ApplicationException("Invalid password");
+        }
+
+        var validation = _passwordVal.Validate(newPassword);
+
+        if (!validation.IsValid)
+        {
+            throw new ApplicationException("Validation failed: " + validation);
+        }
+        
+        var hashAndSalt = CreatePasswordHash(newPassword);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
+
+        try
+        {
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new ApplicationException("Error updating password");
+        }
+        return true;
+    }
+
+   /* public async Task<bool> ResetPassword(string email) // requires mail system
+    {
+        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
+
+        if (employee.Email != email)
+        {
+            throw new ApplicationException("Invalid email");
+        }
+
+        var newPassword = getRandomPassword();
+
+        var hashAndSalt = CreatePasswordHash(newPassword);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
+
+        try
+        {
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new ApplicationException("Error updating password");
+        }
+        return true;
+    } */
 
     public void CreateDB()
     {
@@ -159,6 +215,15 @@ public class EmployeeService : IEmployeeService
         }
 
         return true;
+    }
+
+    private HashAndSalt CreatePasswordHash(string password)
+    {
+        using var hmac = new HMACSHA512();
+        var Hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var Salt = hmac.Key;
+        var hashAndSalt = new HashAndSalt(Hash, Salt);
+        return hashAndSalt;
     }
 
     private string getRandomPassword(){
@@ -206,5 +271,17 @@ public class EmployeeService : IEmployeeService
             password += toAdd;
         }
         return password;
+    }
+}
+
+internal class HashAndSalt
+{
+    public byte[] Hash { get; set; }
+    public byte[] Salt { get; set; }
+
+    public HashAndSalt(byte[] hash, byte[] salt)
+    {
+        Hash = hash;
+        Salt = salt;
     }
 }

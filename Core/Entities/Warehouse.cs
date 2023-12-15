@@ -17,10 +17,6 @@ public class Warehouse
     public IEnumerable<Shipment> Shipments { get; set; }
     public IEnumerable<ProductLocation> ProductLocations { get; set; }
     public IEnumerable<ProductType> ProductTypes { get; set; }
-    
     public IEnumerable<Brand> Brands { get; set; }
-
-    public IEnumerable<AdminLog> AdminLogs { get; set; }
-
-    public IEnumerable<MoveLog> MoveLogs { get; set; }
+    public IEnumerable<Log> MoveLogs { get; set; }
 }

@@ -4,11 +4,11 @@ using FluentValidation;
 
 namespace Application.Validators;
 
-public class PasswordValidator : AbstractValidator<UserDto> // Rules for userDTO validation
+public class PasswordValidator : AbstractValidator<string> // Rules for userDTO validation
 {
     public PasswordValidator()
     {
-        RuleFor(user => user.Password)
+        RuleFor(stringPassword => stringPassword)
 
               .MinimumLength(8).WithMessage("Password must be at least 8 characters long.")
               .Matches("[0-9]").WithMessage("Password must contain at least one number.")
