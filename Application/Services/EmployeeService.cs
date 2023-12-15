@@ -16,7 +16,6 @@ namespace Application.Services;
 public class EmployeeService : IEmployeeService
 {
     private readonly LoginValidator _loginVal;
-
     private readonly PasswordValidator _passwordVal;
     private readonly UserDtoValidator _userDtoVal;
     private readonly IEmployeeRepository _employeeRepository;
@@ -37,8 +36,6 @@ public class EmployeeService : IEmployeeService
 
     public async Task<UserDto> CreateEmployee(UserDto userDto)
     {
-
-        
         if (await UserExists(userDto.Username))
         {
             throw new ApplicationException("User already exists");
@@ -58,7 +55,13 @@ public class EmployeeService : IEmployeeService
         
         _emailService.SendTemporaryCredentials(email,password);
 
-        var passwordValidation = _passwordVal.Validate(userDto.Password);
+        var password = userDto.Password ?? getRandomPassword(); // Allows us to still manually set the password for testing purposes
+        
+        string email = "renarsmednieks13@gmail.com";
+        
+        _emailService.SendTemporaryCredentials(email,password);
+
+        var passwordValidation = _passwordVal.Validate(password);
 
         if(!passwordValidation.IsValid){
             Console.WriteLine(passwordValidation.ToString());
@@ -69,7 +72,7 @@ public class EmployeeService : IEmployeeService
         
         employee.Name = employee.Name.ToLower();
         employee.Username = employee.Username.ToLower();
-        var hashAndSalt = CreatePasswordHash(userDto.Password);
+        var hashAndSalt = CreatePasswordHash(password);
         employee.PasswordHash = hashAndSalt.Hash;
         employee.PasswordSalt = hashAndSalt.Salt;
 
