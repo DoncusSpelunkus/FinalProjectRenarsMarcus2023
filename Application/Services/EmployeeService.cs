@@ -22,8 +22,9 @@ public class EmployeeService : IEmployeeService
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
+    private readonly IEmailService _emailService;
 
-    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper)
+    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper,IEmailService emailService)
     {
         _employeeRepository = employeeRepository;
         _tokenService = tokenService;
@@ -31,6 +32,7 @@ public class EmployeeService : IEmployeeService
         _passwordVal = new PasswordValidator();
         _userDtoVal =  new UserDtoValidator();
         _mapper = mapper;
+        _emailService = emailService;
     }
 
     public async Task<UserDto> CreateEmployee(UserDto userDto)
@@ -48,6 +50,13 @@ public class EmployeeService : IEmployeeService
             Console.WriteLine(validation.ToString());
             throw new ApplicationException("Invalid user data: " + validation);
         }
+        
+        string email = "renarsmednieks13@gmail.com";
+        string password = registerDto.Password;
+        
+        Console.WriteLine("About to send");
+        
+        _emailService.SendTemporaryCredentials(email,password);
 
         var passwordValidation = _passwordVal.Validate(userDto.Password);
 
@@ -57,7 +66,7 @@ public class EmployeeService : IEmployeeService
         }
 
         var employee = _mapper.Map<Employee>(userDto);
-
+        
         employee.Name = employee.Name.ToLower();
         employee.Username = employee.Username.ToLower();
         var hashAndSalt = CreatePasswordHash(userDto.Password);

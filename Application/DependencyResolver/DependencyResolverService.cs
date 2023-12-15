@@ -36,6 +36,7 @@ public static class DependencyResolverService
         services.AddScoped<ITypeService, TypeService>(); // for both class's 
         services.AddScoped<ITimeMapService, TimeMapService>(); // for both class's 
         services.AddScoped<IBackupService, BackupService>();
+        services.AddScoped<IEmailService, GmailEmailService>();
 
 
 
