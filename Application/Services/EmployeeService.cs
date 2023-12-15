@@ -48,12 +48,8 @@ public class EmployeeService : IEmployeeService
             throw new ApplicationException("Invalid user data: " + validation);
         }
         
-        string email = "renarsmednieks13@gmail.com";
-        string password = registerDto.Password;
-        
+
         Console.WriteLine("About to send");
-        
-        _emailService.SendTemporaryCredentials(email,password);
 
         var password = userDto.Password ?? getRandomPassword(); // Allows us to still manually set the password for testing purposes
         
