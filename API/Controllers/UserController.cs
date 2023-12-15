@@ -196,7 +196,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpGet("ResetPassword/{id}")]
+   /*[HttpGet("ResetPassword/{id}")]
     public async Task<ActionResult<bool>> ResetPassword(string email)
     {
         try
@@ -215,7 +215,7 @@ public class UserController : ControllerBase
             Console.WriteLine("Error in ResetPassword" + e);
             return BadRequest(e.Message);
         }
-    }
+    }*/
 
     private async void TriggerGetAllUsers(int warehouseId)
     {
