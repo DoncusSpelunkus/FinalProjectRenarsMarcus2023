@@ -71,7 +71,7 @@ public class LocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<LocationDto>> CreateLocation(LocationDto locationDto)
     {
@@ -97,7 +97,7 @@ public class LocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPut("Update")]
     public async Task<ActionResult<LocationDto>> UpdateLocation(LocationDto locationDto)
     {
@@ -123,7 +123,7 @@ public class LocationController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("Delete")]
     public async Task<ActionResult<bool>> DeleteLocation(LocationDto locationDto)
     {
@@ -133,7 +133,7 @@ public class LocationController : ControllerBase
 
             if (location == false)
             {
-                return BadRequest("No employee found");
+                return BadRequest("No location found");
             }
             
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
@@ -149,6 +149,30 @@ public class LocationController : ControllerBase
         }
     }
 
+    [Authorize(Roles = "admin")]
+    [HttpPost("createBatch")]
+    public async Task<ActionResult<List<LocationDto>>> CreateBatch(LocationDto locationDto){
+        try {
+            var list = await _locationService.CreateLocationBatch(locationDto);
+
+            if (list == null)
+            {
+                return BadRequest("Something went wrong");
+            }
+
+            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+
+            TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
+
+            return list;
+
+        }
+        catch(Exception e) {
+            Console.WriteLine("Error in DeleteEmployee" + e);
+            return BadRequest(e.Message);
+        }
+    }
+    
     private async void TriggerGetAllLocations(int warehouseId)
     {
         var data = this._locationService.GetLocationsByWarehouseAsync(warehouseId);

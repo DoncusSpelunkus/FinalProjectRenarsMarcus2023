@@ -9,4 +9,6 @@ public interface ILocationService
     Task<LocationDto> CreateLocationAsync(LocationDto locationDto);
     Task<LocationDto> UpdateLocationAsync(LocationDto locationDto);
     Task<bool> DeleteLocationAsync(LocationDto locationDto);
+
+    Task<List<LocationDto>> CreateLocationBatch(LocationDto locationDto);
 }

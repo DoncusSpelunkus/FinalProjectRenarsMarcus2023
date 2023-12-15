@@ -19,4 +19,5 @@ public class Employee
     public Warehouse Warehouse { get; set; }
     public int WarehouseId { get; set; }
     public IEnumerable<Log> Logs { get; set; }
+
 }

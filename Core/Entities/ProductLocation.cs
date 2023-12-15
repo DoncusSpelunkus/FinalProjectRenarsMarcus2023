@@ -8,7 +8,7 @@ public class ProductLocation
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // If you want the ID to be auto-generated
-    public int ProductLocationId { get; set; }
+    public string ProductLocationId { get; set; }
     public string ProductSKU { get; set; }
     public string LocationId { get; set; }
     public int Quantity { get; set; }

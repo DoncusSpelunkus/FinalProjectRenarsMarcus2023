@@ -16,6 +16,9 @@ namespace Application.Services;
 public class EmployeeService : IEmployeeService
 {
     private readonly LoginValidator _loginVal;
+
+    private readonly PasswordValidator _passwordVal;
+    private readonly UserDtoValidator _userDtoVal;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
@@ -26,19 +29,28 @@ public class EmployeeService : IEmployeeService
         _employeeRepository = employeeRepository;
         _tokenService = tokenService;
         _loginVal = new LoginValidator();
+        _passwordVal = new PasswordValidator();
+        _userDtoVal =  new UserDtoValidator();
         _mapper = mapper;
         _emailService = emailService;
     }
 
-    public async Task<UserDto> CreateEmployee(RegisterDto registerDto)
+    public async Task<UserDto> CreateEmployee(UserDto userDto)
     {
-        if (await UserExists(registerDto.Username))
+
+        
+        if (await UserExists(userDto.Username))
         {
             throw new ApplicationException("User already exists");
         }
 
-        using var hmac = new HMACSHA512();
+        var validation = _userDtoVal.Validate(userDto);
 
+        if(!validation.IsValid){
+            Console.WriteLine(validation.ToString());
+            throw new ApplicationException("Invalid user data: " + validation);
+        }
+        
         string email = "renarsmednieks13@gmail.com";
         string password = registerDto.Password;
         
@@ -46,18 +58,22 @@ public class EmployeeService : IEmployeeService
         
         _emailService.SendTemporaryCredentials(email,password);
 
-        var user = new Employee
-        {
-            Username = registerDto.Username.ToLower(),
-            Name = registerDto.Name.ToLower(),
-            PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-            PasswordSalt = hmac.Key,
-            Email = registerDto.Email,
-            Role = registerDto.Role,
-            WarehouseId = registerDto.warehouseId
-        };
+        var passwordValidation = _passwordVal.Validate(userDto.Password);
 
-        var registeredEmployee = await _employeeRepository.CreateEmployee(user);
+        if(!passwordValidation.IsValid){
+            Console.WriteLine(passwordValidation.ToString());
+            throw new ApplicationException("Invalid user data: " + passwordValidation);
+        }
+
+        var employee = _mapper.Map<Employee>(userDto);
+        
+        employee.Name = employee.Name.ToLower();
+        employee.Username = employee.Username.ToLower();
+        var hashAndSalt = CreatePasswordHash(userDto.Password);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
+
+        var registeredEmployee = await _employeeRepository.CreateEmployee(employee);
 
         return _mapper.Map<UserDto>(registeredEmployee);
     }
@@ -76,13 +92,15 @@ public class EmployeeService : IEmployeeService
 
     public async Task<UserDto> UpdateEmployee(UserDto userDto)
     {
+        var validation = _userDtoVal.Validate(userDto);
 
-        using var hmac = new HMACSHA512();
-        string password = getRandomPassword();
-        Console.WriteLine(password);
+        if(!validation.IsValid){
+            throw new ApplicationException("Invalid user data: " + validation);
+        }
+        var hashAndSalt = CreatePasswordHash(getRandomPassword());
         var employee = _mapper.Map<Employee>(userDto);
-        employee.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
-        employee.PasswordSalt = hmac.Key; 
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
         var updatedEmployee = await _employeeRepository.UpdateEmployee(employee);
         return _mapper.Map<UserDto>(updatedEmployee);
     }
@@ -120,18 +138,72 @@ public class EmployeeService : IEmployeeService
 
         var token = _tokenService.CreateToken(user);
 
-        return new UserDto
-        {
-            DisplayName = user.Username,
-            Token = token,
-            Role = user.Role,
-            EmployeeId = user.EmployeeId,
-            Username = user.Username,
-            Name = user.Name,
-            Email = user.Email,
-            WarehouseId = user.WarehouseId
-        };
+        var userdto = _mapper.Map<UserDto>(user);
+
+        userdto.Token = token;
+    
+        return userdto;
+
     }
+    
+    public async Task<bool> UpdatePassword(int employeeId, string oldPassword, string newPassword)
+    {
+        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
+
+        if (!VerifyPasswordHash(employee, oldPassword))
+        {
+            throw new ApplicationException("Invalid password");
+        }
+
+        var validation = _passwordVal.Validate(newPassword);
+
+        if (!validation.IsValid)
+        {
+            throw new ApplicationException("Validation failed: " + validation);
+        }
+        
+        var hashAndSalt = CreatePasswordHash(newPassword);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
+
+        try
+        {
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new ApplicationException("Error updating password");
+        }
+        return true;
+    }
+
+   /* public async Task<bool> ResetPassword(string email) // requires mail system
+    {
+        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
+
+        if (employee.Email != email)
+        {
+            throw new ApplicationException("Invalid email");
+        }
+
+        var newPassword = getRandomPassword();
+
+        var hashAndSalt = CreatePasswordHash(newPassword);
+        employee.PasswordHash = hashAndSalt.Hash;
+        employee.PasswordSalt = hashAndSalt.Salt;
+
+        try
+        {
+            await _employeeRepository.UpdateEmployee(employee);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new ApplicationException("Error updating password");
+        }
+        return true;
+    } */
 
     public void CreateDB()
     {
@@ -152,6 +224,15 @@ public class EmployeeService : IEmployeeService
         }
 
         return true;
+    }
+
+    private HashAndSalt CreatePasswordHash(string password)
+    {
+        using var hmac = new HMACSHA512();
+        var Hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var Salt = hmac.Key;
+        var hashAndSalt = new HashAndSalt(Hash, Salt);
+        return hashAndSalt;
     }
 
     private string getRandomPassword(){
@@ -199,5 +280,17 @@ public class EmployeeService : IEmployeeService
             password += toAdd;
         }
         return password;
+    }
+}
+
+internal class HashAndSalt
+{
+    public byte[] Hash { get; set; }
+    public byte[] Salt { get; set; }
+
+    public HashAndSalt(byte[] hash, byte[] salt)
+    {
+        Hash = hash;
+        Salt = salt;
     }
 }

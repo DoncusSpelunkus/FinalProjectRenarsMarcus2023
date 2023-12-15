@@ -16,7 +16,7 @@ public static class DependencyResolverService
     {
         services.AddScoped<AbstractValidator<ProductDto>, ProductValidator>(); // this line works // check the docs  : https://docs.fluentvalidation.net/en/latest/di.html
         services.AddScoped<AbstractValidator<LocationDto>, LocationDtoValidator>();
-        services.AddScoped<AbstractValidator<CreateProductLocationDto>, CreateProductLocationDtoValidator>();
+        services.AddScoped<AbstractValidator<ActionDto>, ActionDtoValidator>();
         services.AddScoped<AbstractValidator<ShipmentDto>, ShipmentDtoValidator>();
         services.AddScoped<AbstractValidator<ShipmentDetailDto>, ShipmentDetailDtoValidator>();
         services.AddScoped<AbstractValidator<TypeDto>, TypeDtoValidator>();

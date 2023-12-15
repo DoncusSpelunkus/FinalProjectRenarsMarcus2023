@@ -15,8 +15,8 @@ public class Log
     public string ToLocationId { get; set; }
     public int Quantity { get; set; }
     public int UserId { get; set; }
+    public string Type { get; set; }
     public DateTime Timestamp { get; set; }
     public int WarehouseId { get; set; }
     public Employee Employee { get; set; }
-    public Product Product { get; set; }
 }

@@ -21,7 +21,7 @@ public class WarehouseController : ControllerBase{
         _warehouseService = warehouseService;
     }
     
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<object>> CreateWarehouse(WarehouseDto warehouseDto)
     {
@@ -43,7 +43,7 @@ public class WarehouseController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPut("Update/{id}")]
     public async Task<ActionResult<WarehouseDto>> UpdateWarehouse(WarehouseDto warehouseDto, int id)
     {
@@ -65,7 +65,7 @@ public class WarehouseController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("Delete/{id}")]
     public async Task<ActionResult<bool>> DeleteWarehouse(int id)
     {

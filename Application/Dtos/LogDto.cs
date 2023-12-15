@@ -1,6 +1,6 @@
 ﻿namespace Application.Dtos;
 
-public class LogDto
+public class MoveLogDto
 {
     public int LogId { get; set; }
     public string ProductSKU { get; set; }
@@ -10,4 +10,6 @@ public class LogDto
     public int UserId { get; set; }
     public DateTime Timestamp { get; set; }
     public int WarehouseId { get; set; }
+
+    public string? Type { get; set; }
 }

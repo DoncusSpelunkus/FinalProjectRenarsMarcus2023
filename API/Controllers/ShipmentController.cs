@@ -20,7 +20,7 @@ public class ShipmentController : ControllerBase{
         _shipmentService = shipmentService;
     }
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<ShipmentDto>> CreateShipment(ShipmentDto shipmentDto)
     {
@@ -42,7 +42,7 @@ public class ShipmentController : ControllerBase{
         }
     }
     
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpDelete("Delete/{id}")]
     public async Task<ActionResult<bool>> DeleteShipment(int id)
     {
@@ -63,7 +63,7 @@ public class ShipmentController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpPut("AddToShipment/{shipmentId}")]
     public async Task<ActionResult<ShipmentDetailDto>> AddToShipment(int shipmentId, ShipmentDetailDto shipmentDetailDto)
     {
@@ -85,7 +85,7 @@ public class ShipmentController : ControllerBase{
     }
     
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpPut("RemoveFromShipment/{shipmentId}/{shipmentDetailId}")]
     public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int shipmentDetailId)
     {
@@ -107,7 +107,7 @@ public class ShipmentController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpPut("ChangeQuantiy/{shipmentId}/{shipmentDetailId}/{quantity}")]
     public async Task<ActionResult<bool>> ChangeQuantity(int shipmentId, int shipmentDetailId, int quantity)
     {
@@ -128,7 +128,7 @@ public class ShipmentController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpGet("GetAllByWarehouseId/{warehouseId}")]
     public async Task<ActionResult<List<ShipmentDto>>> GetShipmentsByWarehouse(int warehouseId)
     {
@@ -149,7 +149,7 @@ public class ShipmentController : ControllerBase{
         }
     }
 
-    [Authorize(Roles = "Sales, Admin")]
+    [Authorize(Roles = "Sales, admin")]
     [HttpGet("GetByShipmentId/{shipmentId}")]
     public async Task<ActionResult<ShipmentDto>> GetShipmentById(int shipmentId)
     {

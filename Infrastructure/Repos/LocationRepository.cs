@@ -56,4 +56,22 @@ public class LocationRepository : ILocationRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<List<Location>> CreateLocationBatch(List<Location> locations)
+    {
+        _context.Locations.AddRange(locations);
+        await _context.SaveChangesAsync();
+        return locations;
+    }
+
+    public async Task<int> getBiggestAisleInt(int warehouseId){
+        try
+        {
+            return await _context.Locations.Where(l => l.WarehouseId == warehouseId).MaxAsync(l => l.Aisle);
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
 }

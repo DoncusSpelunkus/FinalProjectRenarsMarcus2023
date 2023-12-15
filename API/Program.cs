@@ -32,6 +32,13 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
 });
 
+builder.Services.AddLogging(builder =>
+    {
+        builder.AddConsole(); // You can add other logging providers as needed
+        builder.AddDebug();
+    });
+
+
 
 var mapperConfiguration = new MapperConfiguration(cfg =>
 {
@@ -47,19 +54,14 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<ProductLocation, ProductLocationDto>();
     cfg.CreateMap<ProductLocationDto, ProductLocation>();
 
-    cfg.CreateMap<ProductLocation, ProductLocationDto>()
-        .ForMember(dest => dest.LastUpdated, opt => opt.MapFrom(src => src.LastUpdated.ToString("yyyy-MM-ddTHH:mm:ss.fff")))
-        .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.Product))
-        .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location));
+    cfg.CreateMap<ProductLocation, ProductLocationDto>();
 
 
     cfg.CreateMap<Employee, UserDto>();
     cfg.CreateMap<UserDto, Employee>();
-    cfg.CreateMap<Employee, RegisterDto>();
-    cfg.CreateMap<RegisterDto, Employee>();
     cfg.CreateMap<Employee, UserDto>()
         .ForMember(dest => dest.DisplayName, opt => opt.MapFrom(src => src.Name));
-    cfg.CreateMap<CreateProductLocationDto, ProductLocation>();
+
 
     cfg.CreateMap<Shipment, ShipmentDto>()
         .ForMember(dest => dest.ShipmentDetails, opt => opt.MapFrom(src => src.ShipmentDetails));
@@ -72,8 +74,11 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<Brand, BrandDto>();
     cfg.CreateMap<BrandDto, Brand>();
 
-    cfg.CreateMap<Log, LogDto>();
-    cfg.CreateMap<LogDto, Log>();
+    cfg.CreateMap<Log, MoveLogDto>();
+    cfg.CreateMap<MoveLogDto, Log>();
+
+    cfg.CreateMap<ProductLocation, ActionDto>();
+    cfg.CreateMap<ActionDto, ProductLocation>();
 
     cfg.CreateMap<Warehouse, WarehouseDto>();
     cfg.CreateMap<WarehouseDto, Warehouse>();
@@ -98,9 +103,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
                 var path = context.HttpContext.Request.Path;
 
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    (path.StartsWithSegments("/SocketInventory"))
-                    || (path.StartsWithSegments("/SocketUserManagement")))
+                if (
+                    !string.IsNullOrEmpty(accessToken) 
+                    && path.StartsWithSegments("/SocketInventory")
+                    || path.StartsWithSegments("/SocketUserManagement")
+                    || path.StartsWithSegments("/SocketShipments")
+                    || path.StartsWithSegments("/SocketLogs")
+                    )
 
                 {
                     context.Token = accessToken;
@@ -157,5 +166,7 @@ app.MapControllers();
 
 app.MapHub<InventorySocket>("/SocketInventory").RequireAuthorization();
 app.MapHub<UserManagementSocket>("/SocketUserManagement").RequireAuthorization();
+app.MapHub<ShipmentSocket>("/SocketShipment").RequireAuthorization();
+app.MapHub<LogsSocket>("/SocketLogs").RequireAuthorization();
 
 await app.RunAsync();

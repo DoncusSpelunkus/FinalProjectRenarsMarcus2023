@@ -31,11 +31,11 @@ public class UserController : ControllerBase
 
     // [Authorize(Roles = "Admin")]
     [HttpPost("register")]
-    public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
+    public async Task<ActionResult<UserDto>> Register(UserDto receivedUser)
     {
         try
         {
-            var userDto = await _service.CreateEmployee(registerDto);
+            var userDto = await _service.CreateEmployee(receivedUser);
 
             if (userDto == null)
             {
@@ -78,7 +78,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpGet("GetAllByWareHouseId/{id}")]
     public async Task<ActionResult<List<UserDto>>> GetAllByWareHouseId(int id)
     {
@@ -100,7 +100,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpGet("GetById/{id}")]
     public async Task<ActionResult<UserDto>> GetEmployeeById(int id)
     {
@@ -122,7 +122,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpPut("Update")] // Should take an id in param?
     public async Task<ActionResult<UserDto>> UpdateEmployee(UserDto userDto)
     {
@@ -148,7 +148,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("Delete/{id}")]
     public async Task<ActionResult<bool>> DeleteEmployee(int id)
     {
@@ -173,6 +173,49 @@ public class UserController : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
+    [Authorize]
+    [HttpGet("PasswordUpdate/{id}")]
+    public async Task<ActionResult<bool>> PasswordUpdate(int id, string oldPassword, string newPassword)
+    {
+        try
+        {
+            var updated = await _service.UpdatePassword(id, oldPassword, newPassword);
+
+            if (!updated)
+            {
+                return BadRequest("No employee found");
+            }
+
+            return Ok("Password updated");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in PasswordUpdate" + e);
+            return BadRequest(e.Message);
+        }
+    }
+
+   /*[HttpGet("ResetPassword/{id}")]
+    public async Task<ActionResult<bool>> ResetPassword(string email)
+    {
+        try
+        {
+            var updated = await _service.ResetPassword(email);
+
+            if (!updated)
+            {
+                return BadRequest("No employee found");
+            }
+
+            return Ok("Password updated");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in ResetPassword" + e);
+            return BadRequest(e.Message);
+        }
+    }*/
 
     private async void TriggerGetAllUsers(int warehouseId)
     {

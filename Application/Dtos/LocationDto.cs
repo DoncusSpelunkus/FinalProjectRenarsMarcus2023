@@ -1,11 +1,13 @@
 ﻿namespace Application.Dtos;
 
-public class LocationDto
+public class LocationDto 
+// LocationDto can be used in two ways, as a template for creation of batches of new locations
+// or to create singular locations.
 {
-    public string LocationId { get; set; }
-    public string Aisle { get; set; }
-    public string Rack { get; set; }
-    public string Shelf { get; set; }
-    public string Bin { get; set; }
+    public string? LocationId { get; set; }
+    public int Aisle { get; set; }
+    public int Rack { get; set; }
+    public int Shelf { get; set; }
+    public int Bin { get; set; }
     public int WarehouseId { get; set; }
 }
