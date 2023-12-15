@@ -15,14 +15,10 @@ public class LocationRepository : ILocationRepository
         _context = context;
     }
 
-    public async Task<Location> GetLocationAsync(Location location)
+    public async Task<Location> GetLocationAsync(string id)
     {
         return await _context.Locations
-            .FirstOrDefaultAsync(l => l.Aisle == location.Aisle &&
-                                      l.Rack == location.Rack &&
-                                      l.Shelf == location.Shelf &&
-                                      l.Bin == location.Bin &&
-                                      l.WarehouseId == location.WarehouseId);
+            .FirstOrDefaultAsync(l => l.LocationId == id);
     }
 
     public async Task<List<Location>> GetLocationsByWarehouseAsync(int warehouseId)
@@ -46,9 +42,9 @@ public class LocationRepository : ILocationRepository
         return location;
     }
 
-    public async Task<bool> DeleteLocationAsync(Location location)
+    public async Task<bool> DeleteLocationAsync(string id)
     {
-        var existingLocation = await GetLocationAsync(location);
+        var existingLocation = await GetLocationAsync(id);
         if (existingLocation == null)
             return false;
 

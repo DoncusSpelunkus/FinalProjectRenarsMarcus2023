@@ -27,35 +27,16 @@ public class LocationController : ControllerBase
         _hubContext = hubContext;
     }
 
+
+
     [Authorize]
-    [HttpGet("Get")]
-    public async Task<ActionResult<LocationDto>> GetLocation([FromQuery] LocationDto locationDto)
+    [HttpGet("GetAllByWarehouse")]
+    public async Task<ActionResult<List<LocationDto>>> GetLocationsByWarehouse()
     {
         try
         {
-            var location = await _locationService.GetLocationAsync(locationDto);
-
-            if (location == null)
-            {
-                return BadRequest("Location not found");
-            }
-
-            return location;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error in GetLocation" + e);
-            return BadRequest(e.Message);
-        }
-    }
-
-    // [Authorize]
-    [HttpGet("GetAllByWarehouse/{warehouseId}")]
-    public async Task<ActionResult<List<LocationDto>>> GetLocationsByWarehouse(int warehouseId)
-    {
-        try
-        {
-            var locations = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
+            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            var locations = await _locationService.GetLocationsByWarehouseAsync(userWarehouseIdClaim);
 
             if (!locations.Any())
             {
@@ -77,6 +58,7 @@ public class LocationController : ControllerBase
     {
         try
         {
+            locationDto = CrossMethodUserClaimExtractor(locationDto, HttpContext);
             var location = await _locationService.CreateLocationAsync(locationDto);
 
             if (location == null)
@@ -103,6 +85,7 @@ public class LocationController : ControllerBase
     {
         try
         {
+            locationDto = CrossMethodUserClaimExtractor(locationDto, HttpContext);
             var location = await _locationService.UpdateLocationAsync(locationDto);
 
             if (location == null)
@@ -124,12 +107,12 @@ public class LocationController : ControllerBase
     }
 
     [Authorize(Roles = "admin")]
-    [HttpDelete("Delete")]
-    public async Task<ActionResult<bool>> DeleteLocation(LocationDto locationDto)
+    [HttpDelete("Delete/{id}")]
+    public async Task<ActionResult<bool>> DeleteLocation(string id)
     {
         try
         {
-            var location = await _locationService.DeleteLocationAsync(locationDto);
+            var location = await _locationService.DeleteLocationAsync(id);
 
             if (location == false)
             {
@@ -153,6 +136,9 @@ public class LocationController : ControllerBase
     [HttpPost("createBatch")]
     public async Task<ActionResult<List<LocationDto>>> CreateBatch(LocationDto locationDto){
         try {
+
+            locationDto = CrossMethodUserClaimExtractor(locationDto, HttpContext);
+
             var list = await _locationService.CreateLocationBatch(locationDto);
 
             if (list == null)
@@ -175,9 +161,18 @@ public class LocationController : ControllerBase
     
     private async void TriggerGetAllLocations(int warehouseId)
     {
-        var data = this._locationService.GetLocationsByWarehouseAsync(warehouseId);
-        await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("LocationListUpdate", data);
+        var data = _locationService.GetLocationsByWarehouseAsync(warehouseId);
+        await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("LocationListUpdate", data);
 
+    }
+
+    private LocationDto CrossMethodUserClaimExtractor(LocationDto dto, HttpContext httpContext)
+    {
+        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+        dto.WarehouseId = userWarehouseIdClaim;
+        
+        return dto;
     }
 }
 

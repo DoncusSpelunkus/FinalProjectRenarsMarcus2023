@@ -24,18 +24,6 @@ public class LocationService : ILocationService
         _locationValidator = locationValidator;
     }
 
-    public async Task<LocationDto> GetLocationAsync(LocationDto locationDto)
-    {
-        var validationResult = _locationValidator.Validate(locationDto);
-
-        if (!validationResult.IsValid)
-        {
-            throw new ApplicationException("Validation failed for locations");
-        }
-
-        var location = await _locationRepository.GetLocationAsync(_mapper.Map<Location>(locationDto));
-        return _mapper.Map<LocationDto>(location);
-    }
 
     public async Task<List<LocationDto>> GetLocationsByWarehouseAsync(int warehouseId)
     {
@@ -74,10 +62,9 @@ public class LocationService : ILocationService
         return _mapper.Map<LocationDto>(updatedLocation);
     }
 
-    public async Task<bool> DeleteLocationAsync(LocationDto locationDto)
+    public async Task<bool> DeleteLocationAsync(string id)
     {
-        var location = _mapper.Map<Location>(locationDto);
-        return await _locationRepository.DeleteLocationAsync(location);
+        return await _locationRepository.DeleteLocationAsync(id);
     }
 
     public async Task<List<LocationDto>> CreateLocationBatch(LocationDto locationDto)

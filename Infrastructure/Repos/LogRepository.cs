@@ -23,6 +23,8 @@ public class LogRepository : ILogRepository
 
     public async Task<Log> CreateLogAsync(Log log)
     {
+
+        _ = await _context.Employees.FirstOrDefaultAsync(p => p.EmployeeId == log.UserId) ?? throw new ApplicationException("User not found");
         _context.Logs.Add(log);
         await _context.SaveChangesAsync();
         return log;

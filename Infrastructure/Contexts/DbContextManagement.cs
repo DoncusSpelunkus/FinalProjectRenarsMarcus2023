@@ -109,6 +109,10 @@ public class DbContextManagement : DbContext
 
         // SHIPMENT
         modelBuilder.Entity<Shipment>()
+            .Property(e => e.ShipmentId)
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Shipment>()
             .HasOne(s => s.Warehouse)
             .WithMany(w => w.Shipments)
             .HasForeignKey(s => s.WarehouseId);

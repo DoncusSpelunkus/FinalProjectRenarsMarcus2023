@@ -26,28 +26,14 @@ public class Logscontroller : ControllerBase
     }
 
     [Authorize(Roles = "admin")]
-    [HttpGet("GetAllLogs/{warehouseId}")]
-    public async Task<ActionResult<List<MoveLogDto>>> GetLog(int warehouseId)
+    [HttpGet("GetAllLogs")]
+    public async Task<ActionResult<List<MoveLogDto>>> GetLog()
     {
         try
         {
-            
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId"); // Ensures that the user is from the proper warehouse
+            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
 
-            if (userWarehouseIdClaim  == null || !int.TryParse(userWarehouseIdClaim .Value, out var userWarehouseId))
-            {  
-                Console.WriteLine("User not authorized, step 1");
-                return Forbid();
-                
-            }
-
-            if (userWarehouseId != warehouseId)
-            {
-                Console.WriteLine("User not authorized, step 2");
-                return Forbid();
-            } 
-
-            var log = await _productLocationService.GetLogsByWarehouseAsync(warehouseId);
+            var log = await _productLocationService.GetLogsByWarehouseAsync(userWarehouseIdClaim);
 
             if (log == null)
             {
@@ -64,5 +50,6 @@ public class Logscontroller : ControllerBase
             return BadRequest(e.Message);
         }
     }
+
 
 }

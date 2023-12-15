@@ -32,7 +32,7 @@ public class LogsSocket : Hub
 
                     if (warehouseId != null)
                     {
-                        await Groups.AddToGroupAsync(Context.ConnectionId, warehouseId);
+                        await Groups.AddToGroupAsync(Context.ConnectionId, warehouseId + " Logs");
                         Console.WriteLine($"Client {Context.ConnectionId} connected to group {warehouseId} in Logs.");
                     }
                 }
@@ -43,14 +43,6 @@ public class LogsSocket : Hub
             {
                 Console.WriteLine($"Error in OnConnectedAsync: {e.Message}");
             }
-            
-            await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
-
-            await Task.Delay(5000);
-            
-            var list = await _service.GetLogsByWarehouseAsync(int.Parse(user.FindFirst("warehouseId").Value));
-            
-            await Clients.Groups("warehouseId").SendAsync("LogsListUpdate", list);
 
         }
     }
@@ -67,8 +59,8 @@ public class LogsSocket : Hub
 
                 if (warehouseId != null)
                 {
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, warehouseId);
-                    Console.WriteLine($"Client {Context.ConnectionId} disconnected from group {warehouseId}.");
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, warehouseId + " Logs");
+                    Console.WriteLine($"Client {Context.ConnectionId} disconnected from group {warehouseId} Logs.");
                 }
             }
         }
@@ -78,6 +70,27 @@ public class LogsSocket : Hub
         }
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    public async Task RequestLogs()
+    {
+        var user = Context.User;
+
+        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        {
+            var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+            if (role != "admin")
+            {
+                await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                return;
+            }
+
+            var warehouseId = user.FindFirst("warehouseId")?.Value;
+
+            var list = await _service.GetLogsByWarehouseAsync(int.Parse(warehouseId!));
+
+            await Clients.Group(warehouseId + " Logs").SendAsync("LogsListUpdate", list);
+        }
     }
 
 

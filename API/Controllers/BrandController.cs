@@ -1,109 +1,153 @@
 using System.Threading.Tasks;
+using API.Helpers;
 using Application.Dtos;
 using Application.IServices;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using sockets;
 
 
 namespace API.Controllers;
 
 [ApiController]
 [Route("[Controller]")]
-public class BrandController : ControllerBase {
-
-private readonly IBrandService _brandService;
-
-public BrandController(IBrandService brandService)
+public class BrandController : ControllerBase
 {
-    _brandService = brandService;
 
-}
+    private readonly IBrandService _brandService;
 
-// [Authorize]
-[HttpGet("GetByWarehouseId/{warehouseId}")]
-public async Task<ActionResult<List<BrandDto>>> GetBrandsByWarehouse(int warehouseId)
-{
-    try
+    private readonly IHubContext<InventorySocket> _hubContext;
+
+    public BrandController(IBrandService brandService, IHubContext<InventorySocket> hubContext)
     {
-        var brands = await _brandService.GetBrandsByWarehouseAsync(warehouseId);
+        _brandService = brandService;
+        _hubContext = hubContext;
 
-        if (brands == null)
+    }
+
+    [Authorize]
+    [HttpGet("GetByWarehouseId")]
+    public async Task<ActionResult<List<BrandDto>>> GetBrandsByWarehouse()
+    {
+        try
         {
-            return NotFound("Brand not found");
+            var userWarehouseIdClaim = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            var brands = await _brandService.GetBrandsByWarehouseAsync(userWarehouseIdClaim);
+
+            if (brands == null)
+            {
+                return NotFound("Brand not found");
+            }
+
+            return brands;
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpPost("Create")]
+    public async Task<ActionResult<BrandDto>> CreateBrand(BrandDto BrandDto)
+    {
+        try
+        {
+            BrandDto = CrossMethodUserClaimExtractor(BrandDto, HttpContext);
+            var brand = await _brandService.CreateBrandAsync(BrandDto);
+
+            if (brand == null)
+            {
+                return BadRequest("Brand not found");
+            }
+
+            TriggerGetAllBrands(BrandDto.WarehouseId);
+
+            return brand;
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpDelete("Delete/{id}")]
+    public async Task<ActionResult<bool>> DeleteBrand(int id)
+    {
+        try
+        {   
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            var brand = await _brandService.DeleteBrandAsync(id);
+
+            if (brand == false)
+            {
+                return BadRequest("Brand not found");
+            }
+
+            TriggerGetAllBrands(warehouseId);
+
+            return Ok("Brand deleted");
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    
+    [HttpGet("GetById/{id}")]
+
+    public async Task<ActionResult<BrandDto>> GetBrandById(int id)
+    {
+        try
+        {
+            var brand = await _brandService.GetBrandByIdAsync(id);
+
+            if (brand == null)
+            {
+                return BadRequest("No brand found");
+            }
+
+            return brand;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in GetBrandById" + e);
+            return BadRequest(e.Message);
         }
 
-        return brands;
     }
-    catch (Exception e)
-    {
-        return BadRequest(e.Message);
-    }
-}
 
-// [Authorize(Roles = "Admin")]
-[HttpPost("Create")]
-public async Task<ActionResult<BrandDto>> CreateBrand(BrandDto BrandDto)
-{
-    try
+    private async void TriggerGetAllBrands(int warehouseId)
     {
-        var brand = await _brandService.CreateBrandAsync(BrandDto);
-
-        if (brand == null)
+        try
         {
-            return BadRequest("Brand not found");
+            var typeList = await _brandService.GetBrandsByWarehouseAsync(warehouseId);
+
+            if (typeList == null)
+            {
+                return;
+            }
+
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("BrandUpdateList", typeList);
         }
-
-        return brand;
-    }
-    catch (Exception e)
-    {
-        return BadRequest(e.Message);
-    }
-}
-
-// [Authorize(Roles = "Admin")]
-[HttpDelete("Delete/{id}")]
-public async Task<ActionResult<bool>> DeleteBrand(int id)
-{
-    try
-    {
-        var brand = await _brandService.DeleteBrandAsync(id);
-
-        if (brand == false)
+        catch (Exception e)
         {
-            return BadRequest("Brand not found");
+            Console.WriteLine("Error in TriggerGetAllShipments" + e);
         }
-
-        return Ok("Brand deleted");
     }
-    catch (Exception e)
+
+    private BrandDto CrossMethodUserClaimExtractor(BrandDto dro, HttpContext httpContext)
     {
-        return BadRequest(e.Message);
+
+        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+        dro.WarehouseId = userWarehouseIdClaim;
+
+        return dro;
     }
-}
-
-// [Authorize]
-[HttpGet("GetById/{id}")]
-public async Task<ActionResult<BrandDto>> GetBrandById(int id)
-{
-    try
-    {
-        var brand = await _brandService.GetBrandByIdAsync(id);
-
-        if (brand == null)
-        {
-            return BadRequest("No brand found");
-        }
-
-        return brand;
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine("Error in GetBrandById" + e);
-        return BadRequest(e.Message);
-    }
-
-}
 
 }

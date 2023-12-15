@@ -121,16 +121,26 @@ public class ProductLocationRepository : IProductLocationRepository
     {
         try
         {
-            _ = await _context.Locations.Where(l => l.LocationId == productLocation.LocationId).FirstAsync();
+            _ = await _context.Locations
+            .Where(l => l.LocationId == productLocation.LocationId).FirstAsync();
         }
         catch (Exception e)
         {
             throw new ApplicationException("Location does not exist");
         }
+        
+        var Something = await _context.ProductLocations
+        .Where(pl => pl.LocationId == productLocation.LocationId).FirstOrDefaultAsync();
+
+        if (Something != null)
+        {
+            throw new ApplicationException("Location already has a product location");
+        }
 
         try
         {
-            _ = await _context.Products.Where(p => p.SKU == productLocation.ProductSKU).FirstAsync();
+            _ = await _context.Products
+            .Where(p => p.SKU == productLocation.ProductSKU).FirstAsync();
         }
         catch (Exception e)
         {

@@ -135,7 +135,7 @@ public class ProductLocationService : IProductLocationService
     {
 
         var DateTimeNow = DateTime.Now;
-
+    
         var sku = !string.IsNullOrEmpty(actionDto.ProductSKU) ? actionDto.ProductSKU : "n/a"; // Fix: Add null check (shouldn´t happen :P)
         var fromLocation = !string.IsNullOrEmpty(actionDto.SourcePLocationId) ? actionDto.SourcePLocationId : "n/a";
         var toLocation = !string.IsNullOrEmpty(actionDto.DestinationPLocationId) ? actionDto.DestinationPLocationId : "n/a";

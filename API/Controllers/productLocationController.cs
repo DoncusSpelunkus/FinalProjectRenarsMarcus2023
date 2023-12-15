@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using API.Helpers;
 using Application.Dtos;
 using Application.IServices;
 using Application.Services;
@@ -18,24 +19,28 @@ public class ProductLocationController : ControllerBase
 
     private readonly IProductLocationService _productLocationService;
     private readonly IHubContext<InventorySocket> _hubContext;
+    private readonly IEmployeeService _service;
 
-    public ProductLocationController(IProductLocationService productLocationService, IHubContext<InventorySocket> hubContext)
+    public ProductLocationController(
+        IProductLocationService productLocationService,
+         IHubContext<InventorySocket> hubContext,
+         IEmployeeService service)
     {
         _productLocationService = productLocationService;
         _hubContext = hubContext;
+        _service = service;
+
     }
 
+    [EnsureUserExists]
     [Authorize(Roles = "admin")]
     [HttpPost("Create")]
     public async Task<ActionResult<ProductLocationDto>> CreateProductLocation(ActionDto actionDto)
     {
         try
         {
-            var userIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-            actionDto.WarehouseId = userWarehouseIdClaim;
-            actionDto.EmployeeId = userIdClaim;
+            actionDto = CrossMethodUserClaimExtractor(actionDto, HttpContext);
 
             var productLocation = await _productLocationService.CreateProductLocationAsync(actionDto);
 
@@ -43,8 +48,8 @@ public class ProductLocationController : ControllerBase
             {
                 return BadRequest("Product Location not found");
             }
-            
-            TriggerGetAllProductLocations(userWarehouseIdClaim);   
+
+            TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return productLocation;
         }
@@ -56,12 +61,14 @@ public class ProductLocationController : ControllerBase
 
 
     [Authorize]
-    [HttpGet("GetListByWarehouseId/{warehouseId}")]
-    public async Task<ActionResult<List<ProductLocationDto>>> GetProductLocationsByWarehouse(int warehouseId)
+    [HttpGet("GetListByWarehouseId")]
+    public async Task<ActionResult<List<ProductLocationDto>>> GetProductLocationsByWarehouse()
     {
         try
         {
-            var productLocationss = await _productLocationService.GetProductLocationsByWarehouseAsync(warehouseId);
+            var userWarehouseIdClaim = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+
+            var productLocationss = await _productLocationService.GetProductLocationsByWarehouseAsync(userWarehouseIdClaim);
 
             if (productLocationss == null)
             {
@@ -82,15 +89,11 @@ public class ProductLocationController : ControllerBase
     {
         try
         {
-            var userIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-            actionDto.WarehouseId = userWarehouseIdClaim;
-            actionDto.EmployeeId = userIdClaim;
+            actionDto = CrossMethodUserClaimExtractor(actionDto, HttpContext);
 
             await _productLocationService.ChangeQuantity(actionDto);
 
-            TriggerGetAllProductLocations(userWarehouseIdClaim);   
+            TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return Ok();
         }
@@ -100,21 +103,18 @@ public class ProductLocationController : ControllerBase
         }
     }
 
+    [EnsureUserExists]
     [Authorize]
     [HttpPatch("MoveQuantity")]
     public async Task<ActionResult> MoveQuantity(ActionDto actionDto)
     {
         try
         {
-             var userIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-            var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-            actionDto.WarehouseId = userWarehouseIdClaim;
-            actionDto.EmployeeId = userIdClaim;
+            actionDto = CrossMethodUserClaimExtractor(actionDto, HttpContext);
 
             await _productLocationService.MoveQuantityAsync(actionDto);
-            
-            TriggerGetAllProductLocations(userWarehouseIdClaim);   
+
+            TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return Ok();
         }
@@ -136,11 +136,22 @@ public class ProductLocationController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("ReceiveMessage", productLocations);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductLocationUpdateList", productLocations);
         }
         catch (Exception e)
         {
             Console.WriteLine("Error in TriggerGetAllProductLocations" + e);
         }
+    }
+
+    private ActionDto CrossMethodUserClaimExtractor(ActionDto actionDto, HttpContext httpContext)
+    {
+        var userIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
+        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+        actionDto.WarehouseId = userWarehouseIdClaim;
+        actionDto.EmployeeId = userIdClaim;
+
+        return actionDto;
     }
 }

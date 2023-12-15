@@ -90,7 +90,7 @@ builder.Services.AddSingleton(mapper);
 Application.DependencyResolver.DependencyResolverService.RegisterApplicationLayer(builder.Services); // part of the dependency line for application 
 Infrastructure.DependencyResolver.DependencyResolverService.RegisterInfrastructureLayer(builder.Services);// part of the dependency line  for infrastructure
 
-
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -107,7 +107,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     !string.IsNullOrEmpty(accessToken) 
                     && path.StartsWithSegments("/SocketInventory")
                     || path.StartsWithSegments("/SocketUserManagement")
-                    || path.StartsWithSegments("/SocketShipments")
+                    || path.StartsWithSegments("/SocketShipment")
                     || path.StartsWithSegments("/SocketLogs")
                     )
 
@@ -125,7 +125,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                     builder.Configuration.GetValue<string>("AppSettings:Secret")
                 )),
-
             ValidateIssuer = false,
             ValidateAudience = false
         };
