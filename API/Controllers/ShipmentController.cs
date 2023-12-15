@@ -99,7 +99,7 @@ public class ShipmentController : ControllerBase
 
 
     [Authorize(Roles = "sales, admin")]
-    [HttpPut("RemoveFromShipment/{shipmentId}/{shipmentDetailId}")]
+    [HttpDelete("RemoveFromShipment/{shipmentId}/{shipmentDetailId}")]
     public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int shipmentDetailId)
     {
         try
@@ -122,7 +122,7 @@ public class ShipmentController : ControllerBase
     }
 
     [Authorize(Roles = "sales, admin")]
-    [HttpPut("ChangeQuantiy/{shipmentId}/{shipmentDetailId}/{quantity}")]
+    [HttpPatch("ChangeQuantiy/{shipmentId}/{shipmentDetailId}/{quantity}")]
     public async Task<ActionResult<bool>> ChangeQuantity(int shipmentId, int shipmentDetailId, int quantity)
     {
         try
@@ -145,11 +145,12 @@ public class ShipmentController : ControllerBase
     }
 
     [Authorize(Roles = "sales, admin")]
-    [HttpGet("GetAllByWarehouseId/{warehouseId}")]
-    public async Task<ActionResult<List<ShipmentDto>>> GetShipmentsByWarehouse(int warehouseId)
+    [HttpGet("GetAllByWarehouseId")]
+    public async Task<ActionResult<List<ShipmentDto>>> GetShipmentsByWarehouse()
     {
         try
         {
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
             var shipments = await _shipmentService.GetShipmentsByWarehouseAsync(warehouseId);
 
             if (shipments == null)

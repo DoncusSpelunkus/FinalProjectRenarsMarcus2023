@@ -32,17 +32,13 @@ public class ShipmentRepository : IShipmentRepository
         return true;
     }
 
-    public async Task<bool> AddProductToShipmentAsync(int shipmentId, ShipmentDetail shipmentDetail)
+    public async Task<ShipmentDetail> AddProductToShipmentAsync(int shipmentId, ShipmentDetail shipmentDetail)
     {
         var shipment = await _context.Shipments.Include(s => s.ShipmentDetails)
-            .FirstOrDefaultAsync(s => s.ShipmentId == shipmentId);
-
-        if (shipment == null)
-            return false;
-
+            .FirstOrDefaultAsync(s => s.ShipmentId == shipmentId) ?? throw new ApplicationException("Shipment not found");
         shipment.ShipmentDetails.Add(shipmentDetail);
         await _context.SaveChangesAsync();
-        return true;
+        return shipmentDetail;
     }
 
     public async Task<bool> RemoveProductFromShipmentAsync(int shipmentId, int shipmentDetailId)
@@ -87,8 +83,17 @@ public class ShipmentRepository : IShipmentRepository
     }
 
     public async Task<Shipment> GetShipmentByIdAsync(int shipmentId)
-    {
-        return await _context.Shipments
-            .FirstOrDefaultAsync(s => s.ShipmentId == shipmentId);
+    {   
+        var shipment = await _context.Shipments.FirstOrDefaultAsync(s => s.ShipmentId == shipmentId) ?? throw new ApplicationException("Shipment not found");
+
+        List<ShipmentDetail> shipmentDetails = await _context.ShipmentDetails
+            .Where(sd => sd.ShipmentId == shipmentId)
+            .Include(sd => sd.Product)
+            .ToListAsync();
+
+        shipment.ShipmentDetails = shipmentDetails;
+
+        return shipment;
+
     }
 }

@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using API.Helpers;
 using Application.Dtos;
 using Application.IServices;
 using Application.Services;
@@ -96,8 +97,9 @@ public class BrandController : ControllerBase
         }
     }
 
-    [Authorize]
+    
     [HttpGet("GetById/{id}")]
+
     public async Task<ActionResult<BrandDto>> GetBrandById(int id)
     {
         try

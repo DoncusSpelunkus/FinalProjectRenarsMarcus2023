@@ -125,10 +125,6 @@ public class DbContextManagement : DbContext
 
         // SHIPMENT DETAIL
         modelBuilder.Entity<ShipmentDetail>()
-            .Property(sd => sd.ShipmentDetailId)
-            .ValueGeneratedOnAdd();
-
-        modelBuilder.Entity<ShipmentDetail>()
             .HasOne(sd => sd.Shipment)
             .WithMany(s => s.ShipmentDetails)
             .HasForeignKey(sd => sd.ShipmentId);
