@@ -43,13 +43,16 @@ public class ProductController : ControllerBase
         }
     }
 
-    // [Authorize]
-    [HttpGet("GetByWarehouseId/{warehouseId}")]
-    public async Task<ActionResult<List<ProductDto>>> GetProductsByWarehouse(int warehouseId)
+    [Authorize]
+    [HttpGet("GetAllByWarehouse")]
+    public async Task<ActionResult<List<ProductDto>>> GetProductsByWarehouse()
     {
+
+        var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+
         try
         {
-            var products = await _productService.GetProductsByWarehouseAsync(warehouseId);
+            var products = await _productService.GetProductsByWarehouseAsync(userWarehouseIdClaim);
 
             if (products == null)
             {
@@ -70,6 +73,8 @@ public class ProductController : ControllerBase
     {
         try
         {
+            productDto = CrossMethodUserClaimExtractor(productDto, HttpContext);
+
             var product = await _productService.CreateProductAsync(productDto);
 
             if (product == null)
@@ -89,13 +94,15 @@ public class ProductController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpPut("Update/{sku}")]
-    public async Task<ActionResult<ProductDto>> UpdateProduct(String sku, ProductDto productDto)
+    [Authorize(Roles = "admin")]
+    [HttpPut("Update")]
+    public async Task<ActionResult<ProductDto>> UpdateProduct(ProductDto productDto)
     {
         try
         {
-            var product = await _productService.UpdateProductAsync(sku, productDto);
+            productDto = CrossMethodUserClaimExtractor(productDto, HttpContext);
+
+            var product = await _productService.UpdateProductAsync(productDto);
 
             if (product == null)
             {
@@ -114,9 +121,9 @@ public class ProductController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "admin")]
     [HttpDelete("Delete/{sku}")]
-    public async Task<ActionResult<bool>> DeleteProduct(String sku)
+    public async Task<ActionResult<bool>> DeleteProduct(string sku)
     {
         try
         {
@@ -143,7 +150,17 @@ public class ProductController : ControllerBase
     private async void TriggerGetAllProducts(int warehouseId)
     {
         var log = await _productService.GetProductsByWarehouseAsync(warehouseId);
-        await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("ProductListUpdate", log);
+        await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductListUpdate", log);
+    }
+
+    private ProductDto CrossMethodUserClaimExtractor(ProductDto dto, HttpContext httpContext)
+    {
+        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+        dto.WarehouseId = userWarehouseIdClaim;
+        
+
+        return dto;
     }
 
 

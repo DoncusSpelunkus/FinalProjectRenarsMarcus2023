@@ -86,6 +86,17 @@ public class WarehouseController : ControllerBase{
             return BadRequest(e.Message);
         }
     }
+
+    /* private ActionDto CrossMethodUserClaimExtractor(WarehouseDto dto, HttpContext httpContext) // for later dev
+    {
+        var userIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
+        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+
+        dto.WarehouseId = userWarehouseIdClaim;
+        dto.EmployeeId = userIdClaim;
+
+        return dto;
+    } */
 }
  
  

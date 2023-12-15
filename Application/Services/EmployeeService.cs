@@ -55,7 +55,7 @@ public class EmployeeService : IEmployeeService
         
         string email = "renarsmednieks13@gmail.com";
         
-        _emailService.SendTemporaryCredentials(email,password);
+        // _emailService.SendTemporaryCredentials(email,password); 
 
         var passwordValidation = _passwordVal.Validate(password);
 

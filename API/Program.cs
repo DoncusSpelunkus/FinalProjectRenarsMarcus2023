@@ -125,7 +125,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
                     builder.Configuration.GetValue<string>("AppSettings:Secret")
                 )),
-
             ValidateIssuer = false,
             ValidateAudience = false
         };

@@ -10,6 +10,5 @@ public class ShipmentDetailDtoValidator : AbstractValidator<ShipmentDetailDto>
         RuleFor(detail => detail.ShipmentId).NotEmpty().GreaterThan(0);
         RuleFor(detail => detail.ProductSKU).NotEmpty();
         RuleFor(detail => detail.Quantity).NotEmpty().GreaterThan(0);
-        RuleFor(detail => detail.Product).NotNull();
     }
 }

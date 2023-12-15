@@ -63,7 +63,7 @@ namespace Application.Services;
         return _mapper.Map<ProductDto>(createdProduct);
     }
     // error cased by the auto mapper 
-    public async Task<ProductDto> UpdateProductAsync(string sku, ProductDto productDto)
+    public async Task<ProductDto> UpdateProductAsync(ProductDto productDto)
     {
         var validationResult = _productValidator.Validate(productDto);
 
@@ -72,7 +72,7 @@ namespace Application.Services;
             throw new ValidationException(validationResult.Errors);
         }
 
-        var existingProduct = await _productRepository.GetProductBySKUAsync(sku);
+        var existingProduct = await _productRepository.GetProductBySKUAsync(productDto.SKU);
         if (existingProduct == null)
         {
             throw new ApplicationException("Product not found.");

@@ -33,11 +33,11 @@ public class ProductRepository : IProductRepository
         return product;
     }
 
-    public async Task<Product> UpdateProductAsync(Product product)
+    public async Task<Product> UpdateProductAsync(Product newproduct)
     {
-        _context.Products.Update(product);
+        _context.Products.Update(newproduct);
         await _context.SaveChangesAsync();
-        return product; 
+        return newproduct; 
     }
 
     public async Task<bool> DeleteProductAsync(string sku)

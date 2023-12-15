@@ -109,6 +109,10 @@ public class DbContextManagement : DbContext
 
         // SHIPMENT
         modelBuilder.Entity<Shipment>()
+            .Property(e => e.ShipmentId)
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Shipment>()
             .HasOne(s => s.Warehouse)
             .WithMany(w => w.Shipments)
             .HasForeignKey(s => s.WarehouseId);
@@ -120,6 +124,10 @@ public class DbContextManagement : DbContext
         // SHIPMENT
 
         // SHIPMENT DETAIL
+        modelBuilder.Entity<ShipmentDetail>()
+            .Property(sd => sd.ShipmentDetailId)
+            .ValueGeneratedOnAdd();
+
         modelBuilder.Entity<ShipmentDetail>()
             .HasOne(sd => sd.Shipment)
             .WithMany(s => s.ShipmentDetails)

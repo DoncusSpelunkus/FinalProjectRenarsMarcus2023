@@ -3,6 +3,7 @@ using Application.Dtos;
 using Application.IServices;
 using Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using sockets;
@@ -42,7 +43,7 @@ public class UserController : ControllerBase
                 return BadRequest("User is Taken");
             }
 
-            TriggerGetAllUsers(userDto.WarehouseId); 
+            TriggerGetAllUsers(userDto.WarehouseId);
 
             return userDto;
         }
@@ -52,14 +53,14 @@ public class UserController : ControllerBase
             return BadRequest(e.Message);
         }
     }
-    
+
     [HttpPost("login")]
     public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
     {
         try
         {
             loginDto.Username = loginDto.Username.ToLower();
-            
+
             var userDto = await _service.LoginAsync(loginDto);
 
 
@@ -79,12 +80,14 @@ public class UserController : ControllerBase
     }
 
     [Authorize(Roles = "admin")]
-    [HttpGet("GetAllByWareHouseId/{id}")]
-    public async Task<ActionResult<List<UserDto>>> GetAllByWareHouseId(int id)
+    [HttpGet("GetAllByWareHouseId")]
+    public async Task<ActionResult<List<UserDto>>> GetAllByWareHouseId()
     {
         try
         {
-            var users = await _service.GetEmployeesByWarehouseId(id);
+
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            var users = await _service.GetEmployeesByWarehouseId(warehouseId);
 
             if (users == null)
             {
@@ -134,10 +137,10 @@ public class UserController : ControllerBase
             {
                 return BadRequest("No employee found");
             }
-            
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
-            
-            TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));   
+
+            var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+
+            TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));
 
             return updatedUser;
         }
@@ -161,9 +164,9 @@ public class UserController : ControllerBase
                 return BadRequest("No employee found");
             }
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
-            
-            TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));   
+            var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+
+            TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));
 
             return Ok("Employee deleted");
         }
@@ -176,11 +179,13 @@ public class UserController : ControllerBase
 
     [Authorize]
     [HttpGet("PasswordUpdate/{id}")]
-    public async Task<ActionResult<bool>> PasswordUpdate(int id, string oldPassword, string newPassword)
+    public async Task<ActionResult<bool>> PasswordUpdate(string oldPassword, string newPassword)
     {
         try
         {
-            var updated = await _service.UpdatePassword(id, oldPassword, newPassword);
+            var userIdClaim = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
+
+            var updated = await _service.UpdatePassword(userIdClaim, oldPassword, newPassword);
 
             if (!updated)
             {
@@ -196,26 +201,26 @@ public class UserController : ControllerBase
         }
     }
 
-   /*[HttpGet("ResetPassword/{id}")]
-    public async Task<ActionResult<bool>> ResetPassword(string email)
-    {
-        try
-        {
-            var updated = await _service.ResetPassword(email);
+    /*[HttpGet("ResetPassword/{id}")]
+     public async Task<ActionResult<bool>> ResetPassword(string email)
+     {
+         try
+         {
+             var updated = await _service.ResetPassword(email);
 
-            if (!updated)
-            {
-                return BadRequest("No employee found");
-            }
+             if (!updated)
+             {
+                 return BadRequest("No employee found");
+             }
 
-            return Ok("Password updated");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Error in ResetPassword" + e);
-            return BadRequest(e.Message);
-        }
-    }*/
+             return Ok("Password updated");
+         }
+         catch (Exception e)
+         {
+             Console.WriteLine("Error in ResetPassword" + e);
+             return BadRequest(e.Message);
+         }
+     }*/
 
     private async void TriggerGetAllUsers(int warehouseId)
     {
@@ -228,7 +233,7 @@ public class UserController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString()).SendAsync("UserListUpdate", productLocations);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " UserMangement").SendAsync("UserListUpdate", productLocations);
         }
         catch (Exception e)
         {
