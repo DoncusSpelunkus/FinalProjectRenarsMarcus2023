@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using Application.IServices;
-using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -18,38 +17,34 @@ public class ShipmentSocket : Hub
     public override async Task OnConnectedAsync()
     {
 
-
-        await base.OnConnectedAsync();
+        try
         {
-            var user = Context.User;
+            var user = Context.User ?? throw new ApplicationException("User is null");
 
-            try
+            if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
             {
-
-                if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+                var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+                if (role != "admin" && role != "sales")
                 {
-                    var warehouseId = user.FindFirst("warehouseId").Value; // Authorizes the user based on their warehouseId claim
-
-                    if (warehouseId != null)
-                    {
-                        await Groups.AddToGroupAsync(Context.ConnectionId, warehouseId);
-                        Console.WriteLine($"Client {Context.ConnectionId} connected to group {warehouseId} in Shipment.");
-                    }
+                    await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                    return;
                 }
 
+                var warehouseId = user.FindFirst("warehouseId")?.Value; // Authorizes the user based on their warehouseId claim
 
+                if (warehouseId != null)
+                {
+                    await Groups.AddToGroupAsync(Context.ConnectionId, warehouseId + " ShipmentManagement");
+                    Console.WriteLine($"Client {Context.ConnectionId} connected to group {warehouseId} in Shipment.");
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Error in OnConnectedAsync: {e.Message}");
-            }
 
-            await Groups.AddToGroupAsync(Context.ConnectionId, "SignalR Users");
 
-            var list = await _service.GetShipmentsByWarehouseAsync(int.Parse(user.FindFirst("warehouseId").Value));
 
-            await Clients.Groups("warehouseId").SendAsync("ShipmentListUpdate", list);
-
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in OnConnectedAsync: {e.Message}");
         }
     }
 
@@ -65,8 +60,8 @@ public class ShipmentSocket : Hub
 
                 if (warehouseId != null)
                 {
-                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, warehouseId);
-                    Console.WriteLine($"Client {Context.ConnectionId} disconnected from group {warehouseId}.");
+                    await Groups.RemoveFromGroupAsync(Context.ConnectionId, warehouseId + " ShipmentManagement");
+                    Console.WriteLine($"Client {Context.ConnectionId} disconnected from group {warehouseId} shipment management.");
                 }
             }
         }
@@ -77,7 +72,25 @@ public class ShipmentSocket : Hub
 
         await base.OnDisconnectedAsync(exception);
     }
+    public async Task RequestShipment()
+    {
+        var user = Context.User;
 
+        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        {
+            var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+            if (role != "admin" && role != "sales")
+            {
+                await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                return;
+            }
 
+            var warehouseId = user.FindFirst("warehouseId")?.Value;
+
+            var list = await _service.GetShipmentsByWarehouseAsync(int.Parse(warehouseId!));
+
+            await Clients.Group(warehouseId + " ShipmentManagement").SendAsync("ShipmentListUpdate", list);
+        }
+    }
 }
 

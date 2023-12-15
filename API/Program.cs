@@ -107,7 +107,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     !string.IsNullOrEmpty(accessToken) 
                     && path.StartsWithSegments("/SocketInventory")
                     || path.StartsWithSegments("/SocketUserManagement")
-                    || path.StartsWithSegments("/SocketShipments")
+                    || path.StartsWithSegments("/SocketShipment")
                     || path.StartsWithSegments("/SocketLogs")
                     )
 
