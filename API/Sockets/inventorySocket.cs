@@ -145,8 +145,8 @@ public class InventorySocket : Hub // Simple hub that automatically adds users t
                 Console.WriteLine("Error in Request: List is null");
                 return;
             }
-
-            await Clients.Caller.SendAsync(message.RequestType.ToString() + "UpdateList", list);
+            Console.WriteLine(message.RequestType.ToString() + "ListUpdate");
+            await Clients.Caller.SendAsync(message.RequestType.ToString() + "ListUpdate", list);
         }
 
     }
