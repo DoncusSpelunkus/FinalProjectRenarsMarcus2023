@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using API.Helpers;
+using Application.Helpers;
 using Application.Dtos;
 using Application.IServices;
 using AutoMapper;
@@ -113,7 +113,6 @@ public class InventorySocket : Hub // Simple hub that automatically adds users t
 
             switch (message.RequestType)
             {
-
                 case EndpointEnum.Product: // 1
                     var productList = await _productService.GetProductsByWarehouseAsync(warehouseId);
                     list = _mapper.Map<List<object>>(productList);
@@ -147,7 +146,7 @@ public class InventorySocket : Hub // Simple hub that automatically adds users t
                 return;
             }
 
-            await Clients.Group(warehouseId + " InventoryManagement").SendAsync(message.RequestType.ToString() + "UpdateList", list);
+            await Clients.Caller.SendAsync(message.RequestType.ToString() + "UpdateList", list);
         }
 
     }

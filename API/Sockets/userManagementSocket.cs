@@ -99,7 +99,7 @@ public class UserManagementSocket : Hub // Simple hub that automatically adds us
 
             var list = await _service.GetEmployeesByWarehouseId(int.Parse(warehouseId!));
 
-            await Clients.Group(warehouseId + " UserMangement").SendAsync("UserListUpdate", list);
+            await Clients.Caller.SendAsync("UserListUpdate", list);
         }
     }
 
