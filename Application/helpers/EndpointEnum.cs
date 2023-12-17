@@ -1,4 +1,4 @@
-namespace API.Helpers
+namespace Application.Helpers
 {
     public enum EndpointEnum
     {
