@@ -161,7 +161,7 @@ public class LocationController : ControllerBase
     
     private async void TriggerGetAllLocations(int warehouseId)
     {
-        var data = _locationService.GetLocationsByWarehouseAsync(warehouseId);
+        var data = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
         await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("LocationListUpdate", data);
 
     }
