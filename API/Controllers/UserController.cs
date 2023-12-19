@@ -18,12 +18,15 @@ public class UserController : ControllerBase
 {
     private readonly IEmployeeService _service;
     private readonly IHubContext<UserManagementSocket> _hubContext;
+    private readonly IHubContext<AuthSocket> _authHubContext;
 
-    public UserController(IEmployeeService service, IHubContext<UserManagementSocket> hubContext)
+    public UserController(IEmployeeService service, IHubContext<UserManagementSocket> hubContext, IHubContext<AuthSocket> authHubContext)
     {
         _service = service;
         _hubContext = hubContext;
+        _authHubContext = authHubContext;
     }
+
 
     [HttpGet("createDb")]
     public string CreateDb()
@@ -169,6 +172,7 @@ public class UserController : ControllerBase
             var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
             TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));
+            await _authHubContext.Clients.Group(id + " AuthManagement").SendAsync("UserDelete");
 
             return Ok("Employee deleted");
         }
@@ -236,6 +240,7 @@ public class UserController : ControllerBase
             }
 
             await _hubContext.Clients.Group(warehouseId.ToString() + " UserMangement").SendAsync("UserListUpdate", productLocations);
+
         }
         catch (Exception e)
         {

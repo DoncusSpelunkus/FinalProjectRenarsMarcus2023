@@ -109,6 +109,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     || path.StartsWithSegments("/SocketUserManagement")
                     || path.StartsWithSegments("/SocketShipment")
                     || path.StartsWithSegments("/SocketLogs")
+                    || path.StartsWithSegments("/SocketAuth")
                     )
 
                 {
@@ -167,5 +168,6 @@ app.MapHub<InventorySocket>("/SocketInventory").RequireAuthorization();
 app.MapHub<UserManagementSocket>("/SocketUserManagement").RequireAuthorization();
 app.MapHub<ShipmentSocket>("/SocketShipment").RequireAuthorization();
 app.MapHub<LogsSocket>("/SocketLogs").RequireAuthorization();
+app.MapHub<AuthSocket>("/SocketAuth").RequireAuthorization();
 
 await app.RunAsync();
