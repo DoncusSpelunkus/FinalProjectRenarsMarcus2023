@@ -10,7 +10,7 @@ public class UserDtoValidator : AbstractValidator<UserDto> // Rules for userDTO 
     {
         RuleFor(user => user.Username)
             .NotEmpty().WithMessage("Username cannot be empty.")
-            .MinimumLength(8).WithMessage("Username must be at least 8 characters long.");
+            .MinimumLength(3).WithMessage("Username must be at least 3 characters long.");
 
         RuleFor(user => user.Email)
             .EmailAddress().WithMessage("Email address is not valid.");

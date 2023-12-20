@@ -35,7 +35,7 @@ public class AuthSocket : Hub // Simple hub that automatically adds users to gro
                     if (id != null)
                     {
                         await Groups.AddToGroupAsync(Context.ConnectionId, id +" AuthManagement");
-                        Console.WriteLine($"Client {Context.ConnectionId} connected to group {id + " AuthManagement"}");
+                        Console.WriteLine($"Client {Context.ConnectionId} connected to group {id + " AuthManagement"} in AuthManagement");
                     }
                 }
 

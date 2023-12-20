@@ -114,7 +114,7 @@ public class EmployeeService : IEmployeeService
         return await _employeeRepository.UserExists(username);
     }
 
-    public async Task<UserDto> LoginAsync(LoginDto loginDto)
+    public async Task<string> LoginAsync(LoginDto loginDto)
     {
         var validation = _loginVal.Validate(loginDto);
 
@@ -136,12 +136,8 @@ public class EmployeeService : IEmployeeService
         }
 
         var token = _tokenService.CreateToken(user);
-
-        var userdto = _mapper.Map<UserDto>(user);
-
-        userdto.Token = token;
-    
-        return userdto;
+        
+        return token;
 
     }
     

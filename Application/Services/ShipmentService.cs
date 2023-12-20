@@ -14,16 +14,20 @@ public class ShipmentService : IShipmentService
     private readonly IValidator<ShipmentDto> _shipmentValidator;
     private readonly IValidator<ShipmentDetailDto> _shipmentDetailValidator;
 
+    private readonly IValidator<AddToShipmentDetails> _addToShipmentDetailsValidator;
+
     public ShipmentService(
         IShipmentRepository shipmentRepository,
         IMapper mapper,
         IValidator<ShipmentDto> shipmentValidator,
-        IValidator<ShipmentDetailDto> shipmentDetailValidator)
-    {
+        IValidator<ShipmentDetailDto> shipmentDetailValidator,
+        IValidator<AddToShipmentDetails> addToShipmentDetailsValidator)
+ {
         _shipmentRepository = shipmentRepository;
         _mapper = mapper;
         _shipmentValidator = shipmentValidator;
         _shipmentDetailValidator = shipmentDetailValidator;
+        _addToShipmentDetailsValidator = addToShipmentDetailsValidator;
     }
 
     public async Task<ShipmentDto> CreateShipmentAsync(ShipmentDto shipmentDto)
@@ -47,21 +51,25 @@ public class ShipmentService : IShipmentService
         return await _shipmentRepository.DeleteShipmentAsync(shipmentId);
     }
 
-    public async Task<ShipmentDetailDto> AddProductToShipmentAsync(ShipmentDetailDto shipmentDetailDto, int shipmentId)
+    public async Task<ShipmentDto> AddProductToShipmentAsync(AddToShipmentDetails addToShipmentDetails, int shipmentId)
     {
        
-        var validationResult = await _shipmentDetailValidator.ValidateAsync(shipmentDetailDto);
+        var validationResult = await _addToShipmentDetailsValidator.ValidateAsync(addToShipmentDetails);
         if (!validationResult.IsValid)
         {
             throw new ValidationException(validationResult.Errors);
         }
         
-        var shipmentDetail = _mapper.Map<ShipmentDetail>(shipmentDetailDto);
-
-        var addedShipmentDetail = await _shipmentRepository.AddProductToShipmentAsync(shipmentId, shipmentDetail);
-        var addedShipmentDetailDto = _mapper.Map<ShipmentDetailDto>(addedShipmentDetail);
+        foreach (var shipmentDetailDto in addToShipmentDetails.ShipmentDetails)
+        {
+            var shipmentDetail = _mapper.Map<ShipmentDetail>(shipmentDetailDto);
+            await _shipmentRepository.AddProductToShipmentAsync(shipmentId, shipmentDetail);
+        }
+        
+        var shipment = await _shipmentRepository.GetShipmentByIdAsync(shipmentId);
+        var shipmentDto = _mapper.Map<ShipmentDto>(shipment);
       
-        return addedShipmentDetailDto;
+        return shipmentDto;
     }
 
     public async Task<bool> RemoveProductFromShipmentAsync( int shipmentId ,int shipmentDetailId )

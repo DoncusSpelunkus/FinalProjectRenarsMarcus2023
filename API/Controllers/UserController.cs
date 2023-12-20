@@ -35,12 +35,14 @@ public class UserController : ControllerBase
         return "DB build complete :D";
     }
 
-    // [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "admin")]
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserDto receivedUser)
     {
         try
         {
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            receivedUser.WarehouseId = warehouseId;
             var userDto = await _service.CreateEmployee(receivedUser);
 
             if (userDto == null)
@@ -60,7 +62,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+    public async Task<ActionResult<string>> Login(LoginDto loginDto)
     {
         try
         {
@@ -136,6 +138,10 @@ public class UserController : ControllerBase
     {
         try
         {
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+
+            userDto.WarehouseId = warehouseId;
+
             var updatedUser = await _service.UpdateEmployee(userDto);
 
             if (updatedUser == null)

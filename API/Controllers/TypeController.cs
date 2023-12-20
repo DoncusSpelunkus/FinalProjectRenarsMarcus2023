@@ -123,7 +123,7 @@ public class TypeController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("TypeUpdateList", typeList);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("TypeListUpdate", typeList);
         }
         catch (Exception e)
         {

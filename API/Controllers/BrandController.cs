@@ -132,7 +132,7 @@ public class BrandController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("BrandUpdateList", typeList);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("BrandListUpdate", typeList);
         }
         catch (Exception e)
         {

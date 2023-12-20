@@ -78,7 +78,7 @@ public class ShipmentController : ControllerBase
 
     [Authorize(Roles = "sales, admin")]
     [HttpPut("AddToShipment/{shipmentId}")]
-    public async Task<ActionResult<ShipmentDetailDto>> AddToShipment(int shipmentId, ShipmentDetailDto shipmentDetailDto)
+    public async Task<ActionResult<ShipmentDto>> AddToShipment(int shipmentId, AddToShipmentDetails shipmentDetailDto)
     {
         try
         {

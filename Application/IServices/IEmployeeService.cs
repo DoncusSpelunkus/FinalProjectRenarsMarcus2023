@@ -12,7 +12,7 @@ public interface IEmployeeService
     Task<UserDto> UpdateEmployee(UserDto userDto);
     Task<bool> DeleteEmployee(int employeeId);
     Task<bool> UserExists(string username);
-    Task<UserDto> LoginAsync(LoginDto loginDto);
+    Task<string> LoginAsync(LoginDto loginDto);
     Task<bool> UpdatePassword(int employeeId, string oldPassword, string newPassword); // for initial confirmation
    // Task<bool> ResetPassword(string email); // for password reset to automatic password
     void CreateDB();
