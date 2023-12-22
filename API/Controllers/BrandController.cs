@@ -121,6 +121,8 @@ public class BrandController : ControllerBase
 
     }
 
+    
+
     private async void TriggerGetAllBrands(int warehouseId)
     {
         try

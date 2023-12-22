@@ -41,8 +41,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
-            receivedUser.WarehouseId = warehouseId;
+            // var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
             var userDto = await _service.CreateEmployee(receivedUser);
 
             if (userDto == null)
