@@ -212,7 +212,7 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPut("ResetPassword")]
+    [HttpPut("ResetPassword/{email}")]
      public async Task<ActionResult<bool>> ResetPassword(string email)
      {
          try
