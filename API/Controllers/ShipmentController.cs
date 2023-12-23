@@ -99,13 +99,13 @@ public class ShipmentController : ControllerBase
 
 
     [Authorize(Roles = "sales, admin")]
-    [HttpDelete("RemoveFromShipment/{shipmentId}/{shipmentDetailId}")]
-    public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int shipmentDetailId)
+    [HttpDelete("RemoveFromShipment/{shipmentId}")]
+    public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int[] shipmentDetailDto)
     {
         try
         {
 
-            var shipment = await _shipmentService.RemoveProductFromShipmentAsync(shipmentId, shipmentDetailId);
+            var shipment = await _shipmentService.RemoveProductFromShipmentAsync(shipmentId, shipmentDetailDto);
 
             if (shipment = !true)
             {

@@ -72,9 +72,14 @@ public class ShipmentService : IShipmentService
         return shipmentDto;
     }
 
-    public async Task<bool> RemoveProductFromShipmentAsync( int shipmentId ,int shipmentDetailId )
+    public async Task<bool> RemoveProductFromShipmentAsync( int shipmentId ,int[] shipmentDetailId )
     {
-        return await _shipmentRepository.RemoveProductFromShipmentAsync(shipmentId,shipmentDetailId);
+        foreach (var id in shipmentDetailId)
+        {
+            await _shipmentRepository.RemoveProductFromShipmentAsync(shipmentId, id);
+        }
+        
+        return true;
     }
 
     public async Task<bool> ChangeProductQuantityInShipmentAsync( int shipmentId ,int shipmentDetailId, int newQuantity)
