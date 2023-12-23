@@ -16,7 +16,7 @@ public interface IEmployeeRepository
 
     Task<bool> DeleteEmployee(int employeeId);
     
-    Task<bool> UserExists(string username);
+    Task<bool> UserExists(string username, string email);
     
     Task<Employee> GetUserByUsernameAsync(string username);
 

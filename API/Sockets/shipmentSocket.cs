@@ -70,7 +70,6 @@ public class ShipmentSocket : Hub
             Console.WriteLine($"Error in OnDisconnectedAsync: {e.Message}");
         }
 
-        await base.OnDisconnectedAsync(exception);
     }
     public async Task RequestShipment()
     {

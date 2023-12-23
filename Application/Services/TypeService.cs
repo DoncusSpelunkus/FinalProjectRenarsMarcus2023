@@ -56,4 +56,21 @@ public class TypeService : ITypeService
 
         return typeDto;
     }
+
+    public async Task<TypeDto> UpdateTypeAsync(TypeDto typeDto)
+    {
+        var validationResult = await _typeValidator.ValidateAsync(typeDto);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
+        var type = _mapper.Map<ProductType>(typeDto);
+
+        var updatedType = await _typeRepository.UpdateProductTypeAsync(type);
+
+        var updatedTypeDto = _mapper.Map<TypeDto>(updatedType);
+
+        return updatedTypeDto;
+    }
 }

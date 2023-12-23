@@ -45,4 +45,22 @@ public class BrandRepository : IBrandRepository
     {
         return await _context.Brands.FirstOrDefaultAsync(p => p.BrandId == id);
     }
+
+    public async Task<Brand> UpdateBrandAsync(Brand brand)
+    {
+        var existingBrand = await _context.Brands.FindAsync(brand.BrandId);
+
+        if (existingBrand == null)
+        {
+            throw new ApplicationException("Employee not found");
+        }
+
+        
+        _context.Entry(existingBrand).CurrentValues.SetValues(brand);
+
+        await _context.SaveChangesAsync();
+
+        return existingBrand;
+
+    }
 }
