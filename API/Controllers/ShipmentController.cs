@@ -201,7 +201,7 @@ public class ShipmentController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString() + " ShipmentManagement").SendAsync("ShipmentUpdateList", shipmentList);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " ShipmentManagement").SendAsync("ShipmentListUpdate", shipmentList);
         }
         catch (Exception e)
         {

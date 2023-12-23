@@ -136,7 +136,7 @@ public class ProductLocationController : ControllerBase
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductLocationUpdateList", productLocations);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductLocationListUpdate", productLocations);
         }
         catch (Exception e)
         {
