@@ -99,7 +99,7 @@ public class ShipmentController : ControllerBase
 
 
     [Authorize(Roles = "sales, admin")]
-    [HttpDelete("RemoveFromShipment/{shipmentId}")]
+    [HttpPatch("RemoveFromShipment/{shipmentId}")]
     public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int[] shipmentDetailDto)
     {
         try

@@ -35,13 +35,14 @@ public class UserController : ControllerBase
         return "DB build complete :D";
     }
 
-    // [Authorize(Roles = "admin")]
+    [Authorize(Roles = "admin")]
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(UserDto receivedUser)
     {
         try
         {
-            // var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            var warehouseId = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            receivedUser.WarehouseId = warehouseId;
             var userDto = await _service.CreateEmployee(receivedUser);
 
             if (userDto == null)
