@@ -85,7 +85,7 @@ public class ProductLocationController : ControllerBase
 
     [Authorize(Roles = "admin")]
     [HttpPatch("ChangeQuantity")]
-    public async Task<ActionResult> IncreaseQuantity(ActionDto actionDto)
+    public async Task<ActionResult> UpdateQuantity(ActionDto actionDto)
     {
         try
         {

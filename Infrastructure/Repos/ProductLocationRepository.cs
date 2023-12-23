@@ -26,7 +26,7 @@ public class ProductLocationRepository : IProductLocationRepository
     }
 
 
-    public async Task ChangeQuantity(string productLocationId, int quantityToAdd)
+    public async Task ChangeQuantity(string productLocationId, int modifiedQuantity)
     {
 
 
@@ -36,7 +36,7 @@ public class ProductLocationRepository : IProductLocationRepository
          .Include(pl => pl.Location)
          .FirstOrDefaultAsync() ?? throw new ApplicationException("Source location does not exist");
 
-        productLocation.Quantity += quantityToAdd;
+        productLocation.Quantity = modifiedQuantity;
 
         _context.Entry(productLocation).State = EntityState.Modified;
 
