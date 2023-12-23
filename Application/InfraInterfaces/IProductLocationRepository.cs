@@ -8,7 +8,7 @@ namespace Application.InfraInterfaces;
         Task<ProductLocation> GetProductLocationAsync(string productLocationId);
         Task ChangeQuantity(string productLocationId, int quantityToAdd);
         Task MoveToExistingLocationAsync(string sourceLocationId, string destinationLocationId, int quantityToMove);
-        Task MoveToNewLocationAsync(ProductLocation productLocation);
+        Task MoveToNewLocationAsync(ProductLocation productLocation, string source);
         Task UpdateLastUpdatedAsync(string productLocationId, DateTime lastUpdated);
         Task<ProductLocation> CreateProductLocationAsync(ProductLocation productLocation);
 

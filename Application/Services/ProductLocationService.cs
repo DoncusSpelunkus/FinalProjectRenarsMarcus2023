@@ -1,4 +1,5 @@
-﻿using Application.Dtos;
+﻿using System.Diagnostics;
+using Application.Dtos;
 using Application.Helpers;
 using Application.InfraInterfaces;
 using Application.IServices;
@@ -69,7 +70,7 @@ public class ProductLocationService : IProductLocationService
         {
             var productLocation = _mapper.Map<ProductLocation>(actionDto);
 
-            await _productLocationRepository.MoveToNewLocationAsync(productLocation);
+            await _productLocationRepository.MoveToNewLocationAsync(productLocation, actionDto.SourcePLocationId);
         }
         else if (actionDto.Type == RoleEnum.MoveToExistingLocation)
         {
@@ -144,7 +145,7 @@ public class ProductLocationService : IProductLocationService
         {
             ProductSKU = sku,
             FromLocationId = fromLocation,
-            ToLocationId = toLocation,
+            ToLocationId = toLocation,  
             Quantity = actionDto.Quantity,
             Timestamp = DateTimeNow,
             WarehouseId = actionDto.WarehouseId,

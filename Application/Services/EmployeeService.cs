@@ -242,7 +242,7 @@ public class EmployeeService : IEmployeeService
         int passwordLen = new Random().Next(8, 15);
         int first = new Random().Next(1, 3);
         int second = new Random().Next(4, 5);
-        int third = new Random().Next(5, 8);
+        int third = new Random().Next(6, 8);
         string password = "";
         char toAdd;
 

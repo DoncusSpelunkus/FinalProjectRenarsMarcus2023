@@ -65,10 +65,6 @@ public class ActionDtoValidator : AbstractValidator<ActionDto>
             .NotNull()
             .WithMessage("Source product location is required.");
 
-            RuleFor(action => action.ProductSKU)
-            .NotNull()
-            .WithMessage("Product SKU is required.");
-
              RuleFor(action => action.Quantity)
             .GreaterThan(0)
             .WithMessage("Quantity must be greater than 0.");
