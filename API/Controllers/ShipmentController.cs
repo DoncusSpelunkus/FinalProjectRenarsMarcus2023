@@ -100,12 +100,12 @@ public class ShipmentController : ControllerBase
 
     [Authorize(Roles = "sales, admin")]
     [HttpPatch("RemoveFromShipment/{shipmentId}")]
-    public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, int[] shipmentDetailDto)
+    public async Task<ActionResult<bool>> RemoveFromShipment(int shipmentId, IntArrayDto shipmentDetailDto)
     {
         try
         {
 
-            var shipment = await _shipmentService.RemoveProductFromShipmentAsync(shipmentId, shipmentDetailDto);
+            var shipment = await _shipmentService.RemoveProductFromShipmentAsync(shipmentId, shipmentDetailDto.data);
 
             if (shipment = !true)
             {
