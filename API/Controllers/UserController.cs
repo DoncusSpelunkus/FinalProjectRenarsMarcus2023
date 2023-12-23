@@ -189,14 +189,14 @@ public class UserController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("PasswordUpdate/{id}")]
-    public async Task<ActionResult<bool>> PasswordUpdate(string oldPassword, string newPassword)
+    [HttpPatch("PasswordUpdate")]
+    public async Task<ActionResult<bool>> PasswordUpdate(NewPasswordDTO dto)
     {
         try
         {
             var userIdClaim = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
 
-            var updated = await _service.UpdatePassword(userIdClaim, oldPassword, newPassword);
+            var updated = await _service.UpdatePassword(userIdClaim, dto.OldPassword, dto.NewPassword);
 
             if (!updated)
             {
