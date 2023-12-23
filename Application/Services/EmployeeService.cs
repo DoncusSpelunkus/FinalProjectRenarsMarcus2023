@@ -141,9 +141,9 @@ public class EmployeeService : IEmployeeService
 
     }
     
-    public async Task<bool> UpdatePassword(int employeeId, string oldPassword, string newPassword)
+    public async Task<bool> UpdatePassword(int id, string oldPassword, string newPassword)
     {
-        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
+        var employee = await _employeeRepository.GetEmployeeById(id) ?? throw new ApplicationException("User not found");
 
         if (!VerifyPasswordHash(employee, oldPassword))
         {
@@ -173,16 +173,13 @@ public class EmployeeService : IEmployeeService
         return true;
     }
 
-   /* public async Task<bool> ResetPassword(string email) // requires mail system
+   public async Task<bool> ResetPassword(string email)
     {
-        var employee = await _employeeRepository.GetEmployeeById(employeeId) ?? throw new ApplicationException("User not found");
-
-        if (employee.Email != email)
-        {
-            throw new ApplicationException("Invalid email");
-        }
+        var employee = await _employeeRepository.GetUserByEmailAsync(email) ?? throw new ApplicationException("User not found");
 
         var newPassword = getRandomPassword();
+
+        _emailService.SendTemporaryCredentials(email, newPassword); 
 
         var hashAndSalt = CreatePasswordHash(newPassword);
         employee.PasswordHash = hashAndSalt.Hash;
@@ -194,11 +191,11 @@ public class EmployeeService : IEmployeeService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
             throw new ApplicationException("Error updating password");
         }
+    
         return true;
-    } */
+    } 
 
     public void CreateDB()
     {

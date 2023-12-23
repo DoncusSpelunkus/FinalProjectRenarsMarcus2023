@@ -153,4 +153,9 @@ public class EmployeeRepository : IEmployeeRepository
             throw new ApplicationException("something went wrong while seeding ");
         }
     }
+
+    public async Task<Employee> GetUserByEmailAsync(string email)
+    {
+        return await _context.Employees.SingleOrDefaultAsync(x => x.Email == email) ?? throw new ApplicationException("User not found");
+    }
 }

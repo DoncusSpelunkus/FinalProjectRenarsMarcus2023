@@ -20,6 +20,8 @@ public interface IEmployeeRepository
     
     Task<Employee> GetUserByUsernameAsync(string username);
 
+    Task<Employee> GetUserByEmailAsync (string email);
+
     void CreateDB();
 
 }

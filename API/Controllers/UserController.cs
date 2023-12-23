@@ -212,17 +212,17 @@ public class UserController : ControllerBase
         }
     }
 
-    /*[HttpGet("ResetPassword/{id}")]
+    [HttpPut("ResetPassword")]
      public async Task<ActionResult<bool>> ResetPassword(string email)
      {
          try
          {
-             var updated = await _service.ResetPassword(email);
+            var updated = await _service.ResetPassword(email);
 
-             if (!updated)
-             {
-                 return BadRequest("No employee found");
-             }
+            if (!updated)
+            {
+                return BadRequest("No employee found");
+            }
 
              return Ok("Password updated");
          }
@@ -231,7 +231,7 @@ public class UserController : ControllerBase
              Console.WriteLine("Error in ResetPassword" + e);
              return BadRequest(e.Message);
          }
-     }*/
+     }
 
     private async void TriggerGetAllUsers(int warehouseId)
     {
