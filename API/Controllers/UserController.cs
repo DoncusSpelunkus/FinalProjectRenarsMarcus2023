@@ -232,6 +232,22 @@ public class UserController : ControllerBase
              return BadRequest(e.Message);
          }
      }
+     
+    [HttpPost("ContactSupport")]
+    public ActionResult<string> ResetPassword(string contactEmail,string description)
+    {
+        try
+        {
+            _service.sendEmailToSupport(contactEmail,description);
+            return Ok("Message sent");
+            
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in contacting support" + e);
+            return BadRequest(e.Message);
+        }
+    }
 
     private async void TriggerGetAllUsers(int warehouseId)
     {

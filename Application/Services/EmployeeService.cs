@@ -195,7 +195,12 @@ public class EmployeeService : IEmployeeService
         }
     
         return true;
-    } 
+    }
+
+    public void sendEmailToSupport(string contactEmail, string description)
+    {
+        _emailService.ContactSupport(contactEmail, description);
+    }
 
     public void CreateDB()
     {

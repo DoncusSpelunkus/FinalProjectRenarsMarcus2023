@@ -15,5 +15,6 @@ public interface IEmployeeService
     Task<string> LoginAsync(LoginDto loginDto);
     Task<bool> UpdatePassword(int id, string oldPassword, string newPassword); // for initial confirmation
     Task<bool> ResetPassword(string email); // for password reset to automatic password
+    void sendEmailToSupport(string contactEmail, string description);
     void CreateDB();
 }
