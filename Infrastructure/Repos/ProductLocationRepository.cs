@@ -83,15 +83,17 @@ public class ProductLocationRepository : IProductLocationRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task MoveToNewLocationAsync(ProductLocation productLocation)
+    public async Task MoveToNewLocationAsync(ProductLocation productLocation, string source)
     {
         var sourceProductLocation = await _context.ProductLocations
-            .FirstOrDefaultAsync(pl => pl.ProductLocationId == productLocation.ProductLocationId) ?? throw new ApplicationException("Source location does not exist");
+            .FirstOrDefaultAsync(pl => pl.ProductLocationId == source) ?? throw new ApplicationException("Source location does not exist");
 
         if (sourceProductLocation.Quantity - productLocation.Quantity < 0)
         {
             throw new ApplicationException("Not enough quantity to move, try moving less");
         }
+
+        productLocation.ProductSKU = sourceProductLocation.ProductSKU;
 
         var destinationProductLocation = await CreateProductLocationAsync(productLocation) ?? throw new ApplicationException("Destination location does not exist");
 
@@ -128,7 +130,7 @@ public class ProductLocationRepository : IProductLocationRepository
         {
             throw new ApplicationException("Location does not exist");
         }
-        
+
         var Something = await _context.ProductLocations
         .Where(pl => pl.LocationId == productLocation.LocationId).FirstOrDefaultAsync();
 
