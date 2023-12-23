@@ -42,6 +42,22 @@ public class TypeRepository : ITypeRepository
 
     public async Task<ProductType> GetTypeByIdAsync(int id)
     {
-        return await _context.ProductTypes.FirstOrDefaultAsync(p => p.TypeId == id);
+        return await _context.ProductTypes.FirstOrDefaultAsync(p => p.TypeId == id) ?? throw new ApplicationException("Type not found");
+    }
+
+    public async Task<ProductType> UpdateProductTypeAsync(ProductType type)
+    {
+        var existingType = await _context.ProductTypes.FindAsync(type.TypeId);
+
+        if (existingType == null)
+        {
+            throw new ApplicationException("Type not found");
+        }
+        
+        _context.Entry(existingType).CurrentValues.SetValues(type);
+
+        await _context.SaveChangesAsync();
+
+        return existingType;
     }
 }

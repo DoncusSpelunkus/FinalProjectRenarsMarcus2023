@@ -121,6 +121,31 @@ public class BrandController : ControllerBase
 
     }
 
+    [Authorize(Roles = "admin")]
+    [HttpPut("Update")]
+    public async Task<ActionResult<BrandDto>> UpdateBrand(BrandDto brandDto)
+    {
+        try
+        {
+            brandDto = CrossMethodUserClaimExtractor(brandDto, HttpContext);
+            var brand = await _brandService.UpdateBrandAsync(brandDto);
+
+            if (brand == null)
+            {
+                return BadRequest("Brand not found");
+            }
+
+            TriggerGetAllBrands(brandDto.WarehouseId);
+
+            return brand;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in UpdateBrand" + e);
+            return BadRequest(e.Message);
+        }
+    }
+
     
 
     private async void TriggerGetAllBrands(int warehouseId)

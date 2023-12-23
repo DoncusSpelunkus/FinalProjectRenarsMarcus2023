@@ -139,5 +139,29 @@ public class TypeController : ControllerBase
 
         return dto;
     }
+    
+    [Authorize(Roles = "admin")]
+    [HttpPut("Update")]
+    public async Task<ActionResult<TypeDto>> UpdateType(TypeDto typeDto)
+    {
+        try
+        {
+            typeDto = CrossMethodUserClaimExtractor(typeDto, HttpContext);
+            var type = await _typeService.UpdateTypeAsync(typeDto);
+
+            if (type == null)
+            {
+                return BadRequest("Type not found");
+            }
+
+            TriggerGetAllTypes(typeDto.WarehouseId);
+            return type;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in UpdateType" + e);
+            return BadRequest(e.Message);
+        }
+    }
 
 }

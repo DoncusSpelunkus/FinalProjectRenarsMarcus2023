@@ -38,15 +38,24 @@ public class EmployeeRepository : IEmployeeRepository
 
     public async Task<Employee> GetEmployeeById(int employeeId)
     {
-        return await _context.Employees.FindAsync(employeeId);
+        return await _context.Employees.SingleOrDefaultAsync(x => x.EmployeeId == employeeId) ?? throw new ApplicationException("Employee not found");
     }
 
     public async Task<Employee> UpdateEmployee(Employee employee)
     {
-        _context.Entry(employee).State = EntityState.Modified;
+        var existingEmployee = await _context.Employees.FindAsync(employee.EmployeeId);
+
+        if (existingEmployee == null)
+        {
+            throw new ApplicationException("Employee not found");
+        }
+
+        
+        _context.Entry(existingEmployee).CurrentValues.SetValues(employee);
+
         await _context.SaveChangesAsync();
 
-        return employee;
+        return existingEmployee;
     }
 
     public async Task<bool> DeleteEmployee(int employeeId)
@@ -111,7 +120,7 @@ public class EmployeeRepository : IEmployeeRepository
                     var userData = File.ReadAllText("../Infrastructure/Mock/MockData/employees.json");
                     var users = JsonSerializer.Deserialize<List<Employee>>(userData);
                     using var hmac = new HMACSHA512();
-                   
+
 
                     foreach (var item in users)
                     {

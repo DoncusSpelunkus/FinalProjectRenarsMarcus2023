@@ -55,4 +55,21 @@ public class BrandService : IBrandService
 
         return brandDto;
     }
+
+    public async Task<BrandDto> UpdateBrandAsync(BrandDto brandDto)
+    {
+        var validationResult = _brandValidator.Validate(brandDto);
+        if (!validationResult.IsValid)
+        {
+            throw new ValidationException(validationResult.Errors);
+        }
+
+        var brand = _mapper.Map<Brand>(brandDto);
+
+        var updatedBrand = await _brandRepository.UpdateBrandAsync(brand);
+
+        var updatedBrandDto = _mapper.Map<BrandDto>(updatedBrand);
+
+        return updatedBrandDto;
+    }
 }
