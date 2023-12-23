@@ -36,7 +36,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<UserDto> CreateEmployee(UserDto userDto)
     {
-        if (await UserExists(userDto.Username))
+        if (await UserExists(userDto.Username, userDto.Email))
         {
             throw new ApplicationException("User already exists");
         }
@@ -69,6 +69,7 @@ public class EmployeeService : IEmployeeService
         employee.Name = employee.Name.ToLower();
         employee.Username = employee.Username.ToLower();
         var hashAndSalt = CreatePasswordHash(password);
+
         employee.PasswordHash = hashAndSalt.Hash;
         employee.PasswordSalt = hashAndSalt.Salt;
 
@@ -96,10 +97,14 @@ public class EmployeeService : IEmployeeService
         if(!validation.IsValid){
             throw new ApplicationException("Invalid user data: " + validation);
         }
-        var hashAndSalt = CreatePasswordHash(getRandomPassword());
+
         var employee = _mapper.Map<Employee>(userDto);
-        employee.PasswordHash = hashAndSalt.Hash;
-        employee.PasswordSalt = hashAndSalt.Salt;
+
+        var passwordEmployee = await _employeeRepository.GetEmployeeById(employee.EmployeeId);
+        
+        employee.PasswordHash = passwordEmployee.PasswordHash;
+        employee.PasswordSalt = passwordEmployee.PasswordSalt;
+
         var updatedEmployee = await _employeeRepository.UpdateEmployee(employee);
         return _mapper.Map<UserDto>(updatedEmployee);
     }
@@ -109,9 +114,9 @@ public class EmployeeService : IEmployeeService
         return await _employeeRepository.DeleteEmployee(employeeId);
     }
 
-    public async Task<bool> UserExists(string username)
+    public async Task<bool> UserExists(string username, string email)
     {
-        return await _employeeRepository.UserExists(username);
+        return await _employeeRepository.UserExists(username, email);
     }
 
     public async Task<string> LoginAsync(LoginDto loginDto)
@@ -182,6 +187,7 @@ public class EmployeeService : IEmployeeService
         _emailService.SendTemporaryCredentials(email, newPassword); 
 
         var hashAndSalt = CreatePasswordHash(newPassword);
+        Console.WriteLine("Hash and salt: " + hashAndSalt.Hash + " " + hashAndSalt.Salt);
         employee.PasswordHash = hashAndSalt.Hash;
         employee.PasswordSalt = hashAndSalt.Salt;
 

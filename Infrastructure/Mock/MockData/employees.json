@@ -1,0 +1,14 @@
+[
+    {
+        "EmployeeId": 1,
+        "Username": "PostmanTest",
+        "PasswordSalt": "",
+        "PasswordHash": "",
+        "Name": "PostmanTest",
+        "Email": "PostmanTest@live.dk",
+        "Role": "admin",
+        "WarehouseId": 1
+
+    }
+]
+
