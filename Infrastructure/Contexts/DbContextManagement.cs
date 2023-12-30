@@ -1,23 +1,29 @@
 ﻿using System.Reflection;
+using Application.helpers;
 using Core.Entities;
+using Infrastructure.helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+
 
 namespace Infrastructure.Contexts;
 
 public class DbContextManagement : DbContext
 {
 
-    public DbContextManagement(DbContextOptions<DbContextManagement> options) : base(options)
+    private readonly InfastructureSettings _infastructureSettings;
+
+    public DbContextManagement(DbContextOptions<DbContextManagement> options, IOptions<InfastructureSettings> appSettings) : base(options)
     {
+         _infastructureSettings = appSettings.Value;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Enable detailed logging
-
-
-        // Other configurations...
+        var _connectionString = _infastructureSettings.ConnectionString;
+        Console.WriteLine(_connectionString);
+        optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -85,8 +91,6 @@ public class DbContextManagement : DbContext
         // ORDER
 
         // PRODUCT LOCATION
-
-
         modelBuilder.Entity<ProductLocation>()
             .HasOne(pl => pl.Warehouse)
             .WithMany(w => w.ProductLocations)

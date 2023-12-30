@@ -1,6 +1,7 @@
 using System.Text;
 using Application.Dtos;
 using Application.helpers;
+using Infrastructure.helpers;
 using Application.InfraInterfaces;
 using Application.IServices;
 using Application.Services;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using sockets;
 
@@ -37,8 +39,6 @@ builder.Services.AddLogging(builder =>
         builder.AddConsole(); // You can add other logging providers as needed
         builder.AddDebug();
     });
-
-
 
 var mapperConfiguration = new MapperConfiguration(cfg =>
 {
@@ -92,6 +92,8 @@ Infrastructure.DependencyResolver.DependencyResolverService.RegisterInfrastructu
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<InfastructureSettings>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -131,9 +133,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddDbContext<DbContextManagement>(options => options.UseSqlite(
-
-    "Data source=db.db"
+var _connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<DbContextManagement>(options => 
+options.UseMySql(
+    _connectionString,
+    ServerVersion.AutoDetect(_connectionString)
     ));
 
 //builder.Services.AddScoped<WarehouseRepository>(); // check with this later 

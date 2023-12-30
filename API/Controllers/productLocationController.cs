@@ -19,16 +19,13 @@ public class ProductLocationController : ControllerBase
 
     private readonly IProductLocationService _productLocationService;
     private readonly IHubContext<InventorySocket> _hubContext;
-    private readonly IEmployeeService _service;
 
     public ProductLocationController(
         IProductLocationService productLocationService,
-         IHubContext<InventorySocket> hubContext,
-         IEmployeeService service)
+         IHubContext<InventorySocket> hubContext)
     {
         _productLocationService = productLocationService;
         _hubContext = hubContext;
-        _service = service;
 
     }
 

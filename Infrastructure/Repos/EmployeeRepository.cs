@@ -105,7 +105,7 @@ public class EmployeeRepository : IEmployeeRepository
                     {
                         _context.Warehouses.Add(item);
                     }
-                    _context.SaveChangesAsync();
+                    _context.SaveChanges();
                 }
             }
             catch (Exception ex)
@@ -113,7 +113,7 @@ public class EmployeeRepository : IEmployeeRepository
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
             }
-            try
+          try
             {
                 if (!_context.Employees.Any())
                 {
@@ -130,15 +130,15 @@ public class EmployeeRepository : IEmployeeRepository
                         item.PasswordSalt = Salt;
                         _context.Employees.Add(item);
                     }
-                    _context.SaveChangesAsync();
+                    _context.SaveChanges();
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
-            }
-            try
+            } 
+           try
             {
                 if (!_context.Brands.Any())
                 {
@@ -157,8 +157,8 @@ public class EmployeeRepository : IEmployeeRepository
             {
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
-            }
-            try
+            } 
+           try
             {
                 if (!_context.ProductTypes.Any())
                 {
