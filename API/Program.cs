@@ -92,7 +92,7 @@ Infrastructure.DependencyResolver.DependencyResolverService.RegisterInfrastructu
 
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
-builder.Services.Configure<InfastructureSettings>(builder.Configuration.GetSection("ConnectionStrings"));
+builder.Services.Configure<InfastructureSettings>(builder.Configuration.GetSection("InfastructureSettings"));
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -133,7 +133,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-var _connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var _connectionString = builder.Configuration.GetValue<string>("InfastructureSettings:DefaultConnection");
 builder.Services.AddDbContext<DbContextManagement>(options => 
 options.UseMySql(
     _connectionString,

@@ -12,8 +12,7 @@
 /dataSources/
 /dataSources.local.xml
 /Infrastructure/appsettings.json
-/API/appsettings.json
-/API/appsettings.Development.json
+D:\Crepos\FinalProjectRenarsMarcus2023\API\appsettings.json
 
 # User specific files
 /Application/obj
@@ -30,3 +29,4 @@
 
 /API/db.db-shm
 /API/db.db-wal
+API/appsettings.json
