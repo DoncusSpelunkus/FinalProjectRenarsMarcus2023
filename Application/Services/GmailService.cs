@@ -1,7 +1,9 @@
 ﻿using System.Net.Mail;
+using Application.helpers;
 using Application.IServices;
 using MailKit.Net.Smtp;
 using MailKit;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
@@ -12,8 +14,13 @@ namespace Application.Services
         private const string SmtpServer = "smtp.gmail.com";
         private const int SmtpPort = 587;
         private const string SmtpUsername = "WhereHouseIncBusiness@gmail.com"; // Replace with your Gmail address
-        private const string SmtpPassword = "qwce jypp xwqx xicw"; // Replace with your Gmail password
+        private readonly string SmtpPassword; // SMTP password field
 
+        public GmailEmailService(IOptions<AppSettings> settings)
+        {
+            SmtpPassword = settings.Value.SMTP_KEY; // Access SMTP_PASSWORD
+        }
+        
         public void SendTemporaryCredentials(string receiverEmail, string password)
         {
             var email = new MimeMessage();

@@ -235,7 +235,7 @@ public class UserController : ControllerBase
      }
      
     [HttpPost("ContactSupport")]
-    public ActionResult<string> ResetPassword(string contactEmail,string description)
+    public ActionResult<string> ContactSupport(string contactEmail,string description)
     {
         try
         {
