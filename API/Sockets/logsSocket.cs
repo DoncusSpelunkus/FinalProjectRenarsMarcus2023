@@ -17,14 +17,12 @@ public class LogsSocket : Hub
     }
     public override async Task OnConnectedAsync()
     {
-
-
         await base.OnConnectedAsync();
         {
-            var user = Context.User;
-
             try
             {
+                var user = Context.User;
+
 
                 if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
                 {
@@ -74,22 +72,29 @@ public class LogsSocket : Hub
 
     public async Task RequestLogs()
     {
-        var user = Context.User;
-
-        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        try
         {
-            var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
-            if (role != "admin")
+            var user = Context.User;
+
+            if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
             {
-                await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
-                return;
+                var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+                if (role != "admin")
+                {
+                    await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                    return;
+                }
+
+                var warehouseId = user.FindFirst("warehouseId")?.Value;
+
+                var list = await _service.GetLogsByWarehouseAsync(int.Parse(warehouseId!));
+
+                await Clients.Group(warehouseId + " Logs").SendAsync("LogsListUpdate", list);
             }
-
-            var warehouseId = user.FindFirst("warehouseId")?.Value;
-
-            var list = await _service.GetLogsByWarehouseAsync(int.Parse(warehouseId!));
-
-            await Clients.Group(warehouseId + " Logs").SendAsync("LogsListUpdate", list);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in RequestLogs: {e.Message}");
         }
     }
 

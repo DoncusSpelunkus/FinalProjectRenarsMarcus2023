@@ -12,20 +12,10 @@ namespace Infrastructure.Contexts;
 public class DbContextManagement : DbContext
 {
 
-    private readonly InfastructureSettings _infastructureSettings;
-
     public DbContextManagement(DbContextOptions<DbContextManagement> options, IOptions<InfastructureSettings> infastructureSettings) : base(options)
     {
-         _infastructureSettings = infastructureSettings.Value;
-    }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var _connectionString = _infastructureSettings.DefaultConnection;
-        Console.WriteLine(_connectionString);
-        optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));
     }
-
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

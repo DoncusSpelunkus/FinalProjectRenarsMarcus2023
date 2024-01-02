@@ -84,7 +84,7 @@ public class ProductController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
             
-            TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));    
+            await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));    
 
             return product;
         }
@@ -111,7 +111,7 @@ public class ProductController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
             
             return product;
         }
@@ -136,7 +136,7 @@ public class ProductController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
 
             return Ok("Product deleted");
         }
@@ -147,18 +147,30 @@ public class ProductController : ControllerBase
     }
 
     
-    private async void TriggerGetAllProducts(int warehouseId)
+    private async Task TriggerGetAllProducts(int warehouseId)
     {
-        var log = await _productService.GetProductsByWarehouseAsync(warehouseId);
-        await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductListUpdate", log);
+        try
+        {
+            var products = await _productService.GetProductsByWarehouseAsync(warehouseId);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("ProductListUpdate", products);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in TriggerGetAllProducts" + e);
+        }
+
     }
 
     private ProductDto CrossMethodUserClaimExtractor(ProductDto dto, HttpContext httpContext)
     {
-        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-        dto.WarehouseId = userWarehouseIdClaim;
-        
+        try{
+            var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            dto.WarehouseId = userWarehouseIdClaim;
+        }
+        catch(Exception e){
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
 
         return dto;
     }

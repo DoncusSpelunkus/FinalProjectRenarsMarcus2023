@@ -42,7 +42,7 @@ public class ShipmentController : ControllerBase
                 return BadRequest("Shipment not found");
             }
 
-            TriggerGetAllShipments(shipmentDto.WarehouseId);
+            await TriggerGetAllShipments(shipmentDto.WarehouseId);
 
             return shipment;
         }
@@ -66,7 +66,7 @@ public class ShipmentController : ControllerBase
                 return BadRequest("Shipment not found");
             }
 
-            TriggerGetAllShipments(warehouseId);
+            await TriggerGetAllShipments(warehouseId);
 
             return Ok("Shipment deleted");
         }
@@ -127,7 +127,7 @@ public class ShipmentController : ControllerBase
     {
         try
         {
-            
+
             var shipment = await _shipmentService.ChangeProductQuantityInShipmentAsync(shipmentId, shipmentDetailId, quantity);
 
             if (shipment == false)
@@ -172,7 +172,7 @@ public class ShipmentController : ControllerBase
     {
         try
         {
-        
+
             var shipment = await _shipmentService.GetShipmentByIdAsync(shipmentId);
 
             if (shipment == null)
@@ -180,7 +180,7 @@ public class ShipmentController : ControllerBase
                 return NotFound("Shipment not found");
             }
 
-            
+
 
             return shipment;
         }
@@ -190,7 +190,7 @@ public class ShipmentController : ControllerBase
         }
     }
 
-    private async void TriggerGetAllShipments(int warehouseId)
+    private async Task TriggerGetAllShipments(int warehouseId)
     {
         try
         {
@@ -211,11 +211,18 @@ public class ShipmentController : ControllerBase
 
     private ShipmentDto CrossMethodUserClaimExtractor(ShipmentDto dto, HttpContext httpContext)
     {
-        var userIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
+        try
+        {
+            var userIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-        dto.WarehouseId = userWarehouseIdClaim;
-        dto.ShippedByEmployeeId = userIdClaim;
+            dto.WarehouseId = userWarehouseIdClaim;
+            dto.ShippedByEmployeeId = userIdClaim;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
 
         return dto;
     }

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Data;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Application.InfraInterfaces;
@@ -21,7 +22,6 @@ public class EmployeeRepository : IEmployeeRepository
 
     public async Task<Employee> CreateEmployee(Employee employee)
     {
-
         _context.Employees.Add(employee);
         await _context.SaveChangesAsync();
 
@@ -31,9 +31,16 @@ public class EmployeeRepository : IEmployeeRepository
 
     public async Task<List<Employee>> GetEmployeesByWarehouseId(int warehouseId)
     {
-        return await _context.Employees
-            .Where(e => e.WarehouseId == warehouseId)
-            .ToListAsync();
+        try{
+
+            return await _context.Employees
+                .Where(e => e.WarehouseId == warehouseId)
+                .ToListAsync();
+
+        }catch(Exception e){
+            Console.WriteLine(e);
+            throw new ApplicationException("Something went wrong while fetching employees");
+        }
     }
 
     public async Task<Employee> GetEmployeeById(int employeeId)
@@ -50,7 +57,7 @@ public class EmployeeRepository : IEmployeeRepository
             throw new ApplicationException("Employee not found");
         }
 
-        
+
         _context.Entry(existingEmployee).CurrentValues.SetValues(employee);
 
         await _context.SaveChangesAsync();
@@ -113,7 +120,7 @@ public class EmployeeRepository : IEmployeeRepository
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
             }
-          try
+            try
             {
                 if (!_context.Employees.Any())
                 {
@@ -137,8 +144,8 @@ public class EmployeeRepository : IEmployeeRepository
             {
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
-            } 
-           try
+            }
+            try
             {
                 if (!_context.Brands.Any())
                 {
@@ -157,8 +164,8 @@ public class EmployeeRepository : IEmployeeRepository
             {
                 Console.WriteLine(ex);
                 throw new ApplicationException("something went wrong while seeding ");
-            } 
-           try
+            }
+            try
             {
                 if (!_context.ProductTypes.Any())
                 {

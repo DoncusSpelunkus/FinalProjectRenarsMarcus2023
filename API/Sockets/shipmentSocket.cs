@@ -73,23 +73,31 @@ public class ShipmentSocket : Hub
     }
     public async Task RequestShipment()
     {
-        var user = Context.User;
-
-        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        try
         {
-            var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
-            if (role != "admin" && role != "sales")
+            var user = Context.User;
+
+            if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
             {
-                await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
-                return;
+                var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+                if (role != "admin" && role != "sales")
+                {
+                    await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                    return;
+                }
+
+                var warehouseId = user.FindFirst("warehouseId")?.Value;
+
+                var list = await _service.GetShipmentsByWarehouseAsync(int.Parse(warehouseId!));
+
+                await Clients.Group(warehouseId + " ShipmentManagement").SendAsync("ShipmentListUpdate", list);
             }
-
-            var warehouseId = user.FindFirst("warehouseId")?.Value;
-
-            var list = await _service.GetShipmentsByWarehouseAsync(int.Parse(warehouseId!));
-
-            await Clients.Group(warehouseId + " ShipmentManagement").SendAsync("ShipmentListUpdate", list);
         }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in RequestShipment: {e.Message}");
+        }
+
     }
 }
 

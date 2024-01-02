@@ -33,12 +33,12 @@ public class BrandRepository : IBrandRepository
         var brand = await GetBrnadByIdAsync(id);
         if (brand == null)
         {
-            return false; 
+            return false;
         }
         _context.Brands.Remove(brand);
         await _context.SaveChangesAsync();
         return true;
-        
+
     }
 
     public async Task<Brand> GetBrnadByIdAsync(int id)
@@ -55,7 +55,7 @@ public class BrandRepository : IBrandRepository
             throw new ApplicationException("Employee not found");
         }
 
-        
+
         _context.Entry(existingBrand).CurrentValues.SetValues(brand);
 
         await _context.SaveChangesAsync();

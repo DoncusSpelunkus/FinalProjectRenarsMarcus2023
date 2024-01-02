@@ -68,7 +68,7 @@ public class LocationController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
 
             return location;
         }
@@ -95,7 +95,7 @@ public class LocationController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
 
             return location;
         }
@@ -121,7 +121,7 @@ public class LocationController : ControllerBase
             
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
 
             return Ok("Location deleted");
         }
@@ -148,7 +148,7 @@ public class LocationController : ControllerBase
 
             var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllLocations(int.Parse(userWarehouseIdClaim!.Value));
 
             return list;
 
@@ -159,7 +159,7 @@ public class LocationController : ControllerBase
         }
     }
     
-    private async void TriggerGetAllLocations(int warehouseId)
+    private async Task TriggerGetAllLocations(int warehouseId)
     {
         var data = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
         await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("LocationListUpdate", data);
@@ -168,9 +168,15 @@ public class LocationController : ControllerBase
 
     private LocationDto CrossMethodUserClaimExtractor(LocationDto dto, HttpContext httpContext)
     {
-        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-        dto.WarehouseId = userWarehouseIdClaim;
+        try
+        {
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            dto.WarehouseId = userWarehouseIdClaim;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
         
         return dto;
     }

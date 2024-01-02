@@ -19,11 +19,12 @@ using Microsoft.Extensions.Hosting;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using sockets;
+using API.Controllers;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.WebHost.UseUrls("http://0.0.0.0:80");
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -55,6 +56,7 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<ProductLocationDto, ProductLocation>();
 
     cfg.CreateMap<ProductLocation, ProductLocationDto>();
+
 
 
     cfg.CreateMap<Employee, UserDto>();
@@ -90,6 +92,7 @@ builder.Services.AddSingleton(mapper);
 Application.DependencyResolver.DependencyResolverService.RegisterApplicationLayer(builder.Services); // part of the dependency line for application 
 Infrastructure.DependencyResolver.DependencyResolverService.RegisterInfrastructureLayer(builder.Services);// part of the dependency line  for infrastructure
 
+builder.Services.AddScoped<UserController>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.Configure<InfastructureSettings>(builder.Configuration.GetSection("InfastructureSettings"));
@@ -138,7 +141,7 @@ builder.Services.AddDbContext<DbContextManagement>(options =>
 options.UseMySql(
     _connectionString,
     ServerVersion.AutoDetect(_connectionString)
-    ));
+    ), ServiceLifetime.Scoped);
 
 //builder.Services.AddScoped<WarehouseRepository>(); // check with this later 
 
