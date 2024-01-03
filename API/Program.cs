@@ -2,21 +2,13 @@ using System.Text;
 using Application.Dtos;
 using Application.helpers;
 using Infrastructure.helpers;
-using Application.InfraInterfaces;
 using Application.IServices;
 using Application.Services;
-using Application.Validators;
 using AutoMapper;
 using Core.Entities;
-using FluentValidation;
 using Infrastructure.Contexts;
-using Infrastructure.Repos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using sockets;
 using API.Controllers;
@@ -142,8 +134,6 @@ options.UseMySql(
     _connectionString,
     ServerVersion.AutoDetect(_connectionString)
     ), ServiceLifetime.Scoped);
-
-//builder.Services.AddScoped<WarehouseRepository>(); // check with this later 
 
 var app = builder.Build();
 
