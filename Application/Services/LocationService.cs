@@ -27,9 +27,7 @@ public class LocationService : ILocationService
 
     public async Task<List<LocationDto>> GetLocationsByWarehouseAsync(int warehouseId)
     {
-        Console.WriteLine(warehouseId);
         var locations = await _locationRepository.GetLocationsByWarehouseAsync(warehouseId);
-        Console.WriteLine(locations.Count);
         return _mapper.Map<List<LocationDto>>(locations);
     }
 
@@ -47,7 +45,7 @@ public class LocationService : ILocationService
         return _mapper.Map<LocationDto>(createdLocation);
     }
 
-    // useless method :(
+    // useless method :( EDIT it's not??? Imagine the label within the warehouse changing
     public async Task<LocationDto> UpdateLocationAsync(LocationDto locationDto)
     {
         var validationResult = _locationValidator.Validate(locationDto);

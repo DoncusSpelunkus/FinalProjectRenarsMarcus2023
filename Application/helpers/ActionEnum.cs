@@ -1,6 +1,6 @@
 namespace Application.Helpers;
 
-public enum RoleEnum {
+public enum ActionEnum {
 
     CreateFromScratch = 1,
     MoveToNewLocation = 2,
