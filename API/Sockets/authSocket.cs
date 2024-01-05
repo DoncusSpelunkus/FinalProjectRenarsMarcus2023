@@ -75,15 +75,22 @@ public class AuthSocket : Hub // Simple hub that automatically adds users to gro
 
     public async Task RequestMe()
     {
-        var user = Context.User;
-
-        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        try
         {
-            var id = int.Parse(user.FindFirst("id")?.Value);
+            var user = Context.User ?? throw new ApplicationException("User is null");
 
-            var thisUser = await _employeeService.GetEmployeeById(id);
+            if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+            {
+                var id = int.Parse(user.FindFirst("id")?.Value);
 
-            await Clients.Group(id + " AuthManagement").SendAsync("UserUpdate", thisUser);
+                var thisUser = await _employeeService.GetEmployeeById(id);
+
+                await Clients.Group(id + " AuthManagement").SendAsync("UserUpdate", thisUser);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in RequestMe: {e.Message}");
         }
     }
 }

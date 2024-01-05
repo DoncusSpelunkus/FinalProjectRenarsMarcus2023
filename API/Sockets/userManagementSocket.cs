@@ -84,25 +84,30 @@ public class UserManagementSocket : Hub // Simple hub that automatically adds us
 
     public async Task RequestUsers()
     {
-        var user = Context.User;
-
-        if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
+        try
         {
-            var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
-            if (role != "sales" && role != "admin")
+            var user = Context.User;
+
+            if (user.Identity.IsAuthenticated) // Ensures that the user is authenticated
             {
-                await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
-                return;
+                var role = user.FindFirst(ClaimTypes.Role)?.Value; // Usermanagement socket is only for admins
+                if (role != "sales" && role != "admin")
+                {
+                    await base.OnDisconnectedAsync(exception: new Exception("Unauthorized"));
+                    return;
+                }
+
+                var warehouseId = user.FindFirst("warehouseId")?.Value;
+
+                var list = await _service.GetEmployeesByWarehouseId(int.Parse(warehouseId!));
+
+                await Clients.Caller.SendAsync("UserListUpdate", list);
             }
-
-            var warehouseId = user.FindFirst("warehouseId")?.Value;
-
-            var list = await _service.GetEmployeesByWarehouseId(int.Parse(warehouseId!));
-
-            await Clients.Caller.SendAsync("UserListUpdate", list);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in RequestUsers: {e.Message}");
         }
     }
-
-
 }
 

@@ -1,0 +1,16 @@
+namespace Infrastructure.Contexts;
+
+public class DbContextManagement : DbContext
+{
+
+    private readonly InfastructureSettings _infastructureSettings;
+
+    public DbContextManagement(DbContextOptions<DbContextManagement> options, IOptions<InfastructureSettings> appSettings) : base(options)
+    {
+         _infastructureSettings = appSettings.Value;
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        var _connectionString = _infastructureSettings.ConnectionString;
+        optionsBuilder.UseMySql(_connectionString, ServerVersion.AutoDetect(_connectionString));

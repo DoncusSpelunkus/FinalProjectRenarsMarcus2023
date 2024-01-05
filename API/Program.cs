@@ -1,27 +1,22 @@
 using System.Text;
 using Application.Dtos;
 using Application.helpers;
-using Application.InfraInterfaces;
+using Infrastructure.helpers;
 using Application.IServices;
 using Application.Services;
-using Application.Validators;
 using AutoMapper;
 using Core.Entities;
-using FluentValidation;
 using Infrastructure.Contexts;
-using Infrastructure.Repos;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using sockets;
+using API.Controllers;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+builder.WebHost.UseUrls("http://0.0.0.0:80");
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,8 +33,6 @@ builder.Services.AddLogging(builder =>
         builder.AddDebug();
     });
 
-
-
 var mapperConfiguration = new MapperConfiguration(cfg =>
 {
     cfg.CreateMap<Product, ProductDto>();
@@ -55,6 +48,7 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
     cfg.CreateMap<ProductLocationDto, ProductLocation>();
 
     cfg.CreateMap<ProductLocation, ProductLocationDto>();
+
 
 
     cfg.CreateMap<Employee, UserDto>();
@@ -90,8 +84,11 @@ builder.Services.AddSingleton(mapper);
 Application.DependencyResolver.DependencyResolverService.RegisterApplicationLayer(builder.Services); // part of the dependency line for application 
 Infrastructure.DependencyResolver.DependencyResolverService.RegisterInfrastructureLayer(builder.Services);// part of the dependency line  for infrastructure
 
+builder.Services.AddScoped<UserController>();
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<InfastructureSettings>(builder.Configuration.GetSection("InfastructureSettings"));
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -131,12 +128,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddDbContext<DbContextManagement>(options => options.UseSqlite(
-
-    "Data source=db.db"
-    ));
-
-//builder.Services.AddScoped<WarehouseRepository>(); // check with this later 
+var _connectionString = builder.Configuration.GetValue<string>("InfastructureSettings:DefaultConnection");
+builder.Services.AddDbContext<DbContextManagement>(options => 
+options.UseMySql(
+    _connectionString,
+    ServerVersion.AutoDetect(_connectionString)
+    ), ServiceLifetime.Scoped);
 
 var app = builder.Build();
 

@@ -60,7 +60,7 @@ public class TypeController : ControllerBase
                 return BadRequest("Type not found");
             }
 
-            TriggerGetAllTypes(typeDto.WarehouseId);
+            await TriggerGetAllTypes(typeDto.WarehouseId);
             return type;
         }
         catch (Exception e)
@@ -82,7 +82,7 @@ public class TypeController : ControllerBase
             {
                 return BadRequest("Type not found");
             }
-            TriggerGetAllTypes(warehouseId);
+            await TriggerGetAllTypes(warehouseId);
             return Ok("Type deleted");
         }
         catch (Exception e)
@@ -112,7 +112,7 @@ public class TypeController : ControllerBase
     }
 
 
-    private async void TriggerGetAllTypes(int warehouseId)
+    private async Task TriggerGetAllTypes(int warehouseId)
     {
         try
         {
@@ -132,10 +132,15 @@ public class TypeController : ControllerBase
     }
     private TypeDto CrossMethodUserClaimExtractor(TypeDto dto, HttpContext httpContext)
     {
-
-        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-        dto.WarehouseId = userWarehouseIdClaim;
+        try
+        {
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            dto.WarehouseId = userWarehouseIdClaim;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
 
         return dto;
     }

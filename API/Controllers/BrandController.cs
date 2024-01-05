@@ -63,7 +63,7 @@ public class BrandController : ControllerBase
                 return BadRequest("Brand not found");
             }
 
-            TriggerGetAllBrands(BrandDto.WarehouseId);
+            await TriggerGetAllBrands(BrandDto.WarehouseId);
 
             return brand;
         }
@@ -87,7 +87,7 @@ public class BrandController : ControllerBase
                 return BadRequest("Brand not found");
             }
 
-            TriggerGetAllBrands(warehouseId);
+            await TriggerGetAllBrands(warehouseId);
 
             return Ok("Brand deleted");
         }
@@ -135,7 +135,7 @@ public class BrandController : ControllerBase
                 return BadRequest("Brand not found");
             }
 
-            TriggerGetAllBrands(brandDto.WarehouseId);
+            await TriggerGetAllBrands(brandDto.WarehouseId);
 
             return brand;
         }
@@ -148,7 +148,7 @@ public class BrandController : ControllerBase
 
     
 
-    private async void TriggerGetAllBrands(int warehouseId)
+    private async Task TriggerGetAllBrands(int warehouseId)
     {
         try
         {
@@ -167,14 +167,17 @@ public class BrandController : ControllerBase
         }
     }
 
-    private BrandDto CrossMethodUserClaimExtractor(BrandDto dro, HttpContext httpContext)
+    private BrandDto CrossMethodUserClaimExtractor(BrandDto dto, HttpContext httpContext)
     {
+        try{
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+            dto.WarehouseId = userWarehouseIdClaim;
+        }
+        catch(Exception e){
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
 
-        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-        dro.WarehouseId = userWarehouseIdClaim;
-
-        return dro;
+        return dto;
     }
 
 }

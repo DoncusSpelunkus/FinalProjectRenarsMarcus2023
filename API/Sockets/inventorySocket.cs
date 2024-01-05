@@ -100,55 +100,60 @@ public class InventorySocket : Hub // Simple hub that automatically adds users t
 
     public async Task Request(RequestDto message) // Handles requests from the client
     {
-        Console.WriteLine(message.RequestType);
-        var user = Context.User ?? throw new ApplicationException("User is null");
-
-
-        if (user!.Identity!.IsAuthenticated) // Ensures that the user is authenticated
+        try
         {
+            var user = Context.User ?? throw new ApplicationException("User is null");
 
-            var warehouseId = int.Parse(user.FindFirst("warehouseId")?.Value);
 
-            List<object> list = null;
-
-            switch (message.RequestType)
+            if (user!.Identity!.IsAuthenticated) // Ensures that the user is authenticated
             {
-                case EndpointEnum.Product: // 1
-                    var productList = await _productService.GetProductsByWarehouseAsync(warehouseId);
-                    list = _mapper.Map<List<object>>(productList);
-                    break;
-                case EndpointEnum.ProductLocation: // 2
-                    var productLocationList = await _productLocationService.GetProductLocationsByWarehouseAsync(warehouseId);
-                    list = _mapper.Map<List<object>>(productLocationList);
-                    break;
-                case EndpointEnum.Location: // 3
-                    var locationList = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
-                    list = _mapper.Map<List<object>>(locationList);
-                    break;
-                case EndpointEnum.Brand: // 4
-                    var brandList = await _brandService.GetBrandsByWarehouseAsync(warehouseId);
-                    list = _mapper.Map<List<object>>(brandList);
-                    break;
-                case EndpointEnum.Type: // 5
-                    var typeList = await _typeService.GetTypesByWarehouseAsync(warehouseId);
-                    list = _mapper.Map<List<object>>(typeList);
-                    break;
 
-                default:
-                    Console.WriteLine("Error in Request: No endpoint found");
-                    break;
+                var warehouseId = int.Parse(user.FindFirst("warehouseId")?.Value);
 
+                List<object> list = null;
+
+                switch (message.RequestType)
+                {
+                    case EndpointEnum.Product: // 1
+                        var productList = await _productService.GetProductsByWarehouseAsync(warehouseId);
+                        list = _mapper.Map<List<object>>(productList);
+                        break;
+                    case EndpointEnum.ProductLocation: // 2
+                        var productLocationList = await _productLocationService.GetProductLocationsByWarehouseAsync(warehouseId);
+                        list = _mapper.Map<List<object>>(productLocationList);
+                        break;
+                    case EndpointEnum.Location: // 3
+                        var locationList = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
+                        list = _mapper.Map<List<object>>(locationList);
+                        break;
+                    case EndpointEnum.Brand: // 4
+                        var brandList = await _brandService.GetBrandsByWarehouseAsync(warehouseId);
+                        list = _mapper.Map<List<object>>(brandList);
+                        break;
+                    case EndpointEnum.Type: // 5
+                        var typeList = await _typeService.GetTypesByWarehouseAsync(warehouseId);
+                        list = _mapper.Map<List<object>>(typeList);
+                        break;
+
+                    default:
+                        Console.WriteLine("Error in Request: No endpoint found");
+                        break;
+
+                }
+
+                if (list == null)
+                {
+                    Console.WriteLine("Error in Request: List is null");
+                    return;
+                }
+                Console.WriteLine(message.RequestType.ToString() + "ListUpdate");
+                await Clients.Caller.SendAsync(message.RequestType.ToString() + "ListUpdate", list);
             }
-
-            if (list == null)
-            {
-                Console.WriteLine("Error in Request: List is null");
-                return;
-            }
-            Console.WriteLine(message.RequestType.ToString() + "ListUpdate");
-            await Clients.Caller.SendAsync(message.RequestType.ToString() + "ListUpdate", list);
         }
-
+        catch (Exception e)
+        {
+            Console.WriteLine($"Error in Request: {e.Message}");
+        }
     }
 
 }

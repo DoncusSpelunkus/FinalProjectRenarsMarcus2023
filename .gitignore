@@ -11,6 +11,8 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/Infrastructure/appsettings.json
+D:\Crepos\FinalProjectRenarsMarcus2023\API\appsettings.json
 
 # User specific files
 /Application/obj
@@ -27,3 +29,4 @@
 
 /API/db.db-shm
 /API/db.db-wal
+API/appsettings.json

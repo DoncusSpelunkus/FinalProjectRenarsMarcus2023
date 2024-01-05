@@ -19,16 +19,13 @@ public class ProductLocationController : ControllerBase
 
     private readonly IProductLocationService _productLocationService;
     private readonly IHubContext<InventorySocket> _hubContext;
-    private readonly IEmployeeService _service;
 
     public ProductLocationController(
         IProductLocationService productLocationService,
-         IHubContext<InventorySocket> hubContext,
-         IEmployeeService service)
+         IHubContext<InventorySocket> hubContext)
     {
         _productLocationService = productLocationService;
         _hubContext = hubContext;
-        _service = service;
 
     }
 
@@ -49,7 +46,7 @@ public class ProductLocationController : ControllerBase
                 return BadRequest("Product Location not found");
             }
 
-            TriggerGetAllProductLocations(actionDto.WarehouseId);
+            await TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return productLocation;
         }
@@ -93,7 +90,7 @@ public class ProductLocationController : ControllerBase
 
             await _productLocationService.ChangeQuantity(actionDto);
 
-            TriggerGetAllProductLocations(actionDto.WarehouseId);
+            await TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return Ok();
         }
@@ -114,7 +111,7 @@ public class ProductLocationController : ControllerBase
 
             await _productLocationService.MoveQuantityAsync(actionDto);
 
-            TriggerGetAllProductLocations(actionDto.WarehouseId);
+            await TriggerGetAllProductLocations(actionDto.WarehouseId);
 
             return Ok();
         }
@@ -125,7 +122,7 @@ public class ProductLocationController : ControllerBase
     }
 
 
-    private async void TriggerGetAllProductLocations(int warehouseId)
+    private async Task TriggerGetAllProductLocations(int warehouseId)
     {
         try
         {
@@ -146,12 +143,19 @@ public class ProductLocationController : ControllerBase
 
     private ActionDto CrossMethodUserClaimExtractor(ActionDto actionDto, HttpContext httpContext)
     {
-        var userIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-        var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
-        actionDto.WarehouseId = userWarehouseIdClaim;
-        actionDto.EmployeeId = userIdClaim;
+        try
+        {
+            var userIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
 
+            actionDto.WarehouseId = userWarehouseIdClaim;
+            actionDto.EmployeeId = userIdClaim;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        }
         return actionDto;
     }
 }

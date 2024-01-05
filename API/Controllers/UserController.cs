@@ -50,7 +50,7 @@ public class UserController : ControllerBase
                 return BadRequest("User is Taken");
             }
 
-            TriggerGetAllUsers(userDto.WarehouseId);
+            await TriggerGetAllUsers(userDto.WarehouseId);
 
             return userDto;
         }
@@ -177,7 +177,7 @@ public class UserController : ControllerBase
 
             var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
-            TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));
+            await TriggerGetAllUsers(int.Parse(userWarehouseIdClaim!.Value));
             await _authHubContext.Clients.Group(id + " AuthManagement").SendAsync("UserDelete");
 
             return Ok("Employee deleted");
@@ -250,18 +250,18 @@ public class UserController : ControllerBase
         }
     }
 
-    private async void TriggerGetAllUsers(int warehouseId)
+    private async Task TriggerGetAllUsers(int warehouseId)
     {
         try
         {
-            var productLocations = await _service.GetEmployeesByWarehouseId(warehouseId);
+            var users = await _service.GetEmployeesByWarehouseId(warehouseId);
 
-            if (productLocations == null)
+            if (users == null)
             {
                 return;
             }
 
-            await _hubContext.Clients.Group(warehouseId.ToString() + " UserMangement").SendAsync("UserListUpdate", productLocations);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " UserMangement").SendAsync("UserListUpdate", users);
 
         }
         catch (Exception e)

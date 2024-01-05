@@ -111,7 +111,15 @@ public class EmployeeService : IEmployeeService
 
     public async Task<bool> DeleteEmployee(int employeeId)
     {
-        return await _employeeRepository.DeleteEmployee(employeeId);
+        try
+        {
+            return await _employeeRepository.DeleteEmployee(employeeId);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw new ApplicationException("Employee not found");
+        }
     }
 
     public async Task<bool> UserExists(string username, string email)
