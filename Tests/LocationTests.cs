@@ -120,9 +120,10 @@ public class LocationTests
         locationRepositoryMock.Setup(repo => repo.CreateLocationAsync(It.IsAny<Location>()))
             .ReturnsAsync(createdLocation);
 
+        var validationResult = new ValidationResult(); // Assume validation passes
         var validatorMock = new Mock<AbstractValidator<LocationDto>>();
-        validatorMock.Setup(validator => validator.Validate(locationDto))
-            .Returns(new ValidationResult());
+        validatorMock.Setup(validator => validator.Validate(It.IsAny<ValidationContext<LocationDto>>()))
+            .Returns(validationResult);
 
         var mapperMock = new Mock<IMapper>();
         mapperMock.Setup(mapper => mapper.Map<Location>(locationDto))

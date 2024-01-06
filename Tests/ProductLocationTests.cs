@@ -19,7 +19,6 @@ public class ProductLocationTests
     [InlineData(-51, true)]
     [InlineData(-10, false)]
     [InlineData(0, false)]
-
     public async Task ProductLocationService_ChangeQuantity_ReturnExceptionWhenReturnedQuantityNegative(int quantity, bool expectException)
     {
         // Arrange
