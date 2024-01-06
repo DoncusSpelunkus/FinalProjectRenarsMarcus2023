@@ -13,9 +13,3 @@ namespace Application.InfraInterfaces;
         Task<ProductLocation> CreateProductLocationAsync(ProductLocation productLocation);
 
     }
-    // Task<List<ProductLocation>> GetProductLocationsByWarehouseAsync(int warehouseId);
-    // Task<ProductLocation> GetProductLocationAsync(int productLocationId);
-    // Task IncreaseQuantityAsync(int productLocationId, int modifiedQuantity);
-    // Task DecreaseQuantityAsync(int productLocationId, int quantityToRemove);
-    // Task MoveQuantityAsync(int sourceProductLocationId, int destinationProductLocationId, int quantityToMove);
-    // Task UpdateLastUpdatedAsync(int productLocationId, DateTime lastUpdated);
