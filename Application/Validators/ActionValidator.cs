@@ -16,7 +16,7 @@ public class ActionDtoValidator : AbstractValidator<ActionDto>
             .GreaterThan(0)
             .WithMessage("Warehouse id is required.");
 
-        When(action => action.Type == RoleEnum.CreateFromScratch, () =>
+        When(action => action.Type == ActionEnum.CreateFromScratch, () =>
         {
             RuleFor(action => action.LocationId)
            .NotNull()
@@ -32,7 +32,7 @@ public class ActionDtoValidator : AbstractValidator<ActionDto>
 
         });
 
-        When(action => action.Type == RoleEnum.MoveToExistingLocation, () =>
+        When(action => action.Type == ActionEnum.MoveToExistingLocation, () =>
         {
             RuleFor(action => action.SourcePLocationId)
             .NotNull()
@@ -48,14 +48,18 @@ public class ActionDtoValidator : AbstractValidator<ActionDto>
 
         });
 
-        When(action => action.Type == RoleEnum.ChangeQuantity, () =>
+        When(action => action.Type == ActionEnum.ChangeQuantity, () =>
         {
             RuleFor(action => action.SourcePLocationId)
             .NotNull()
             .WithMessage("Source product location is required.");
+
+            RuleFor(action => action.Quantity)
+            .NotEmpty()
+            .WithMessage("Quantity is required.");
         });
 
-        When(action => action.Type == RoleEnum.MoveToNewLocation, () =>
+        When(action => action.Type == ActionEnum.MoveToNewLocation, () =>
         {
             RuleFor(action => action.SourcePLocationId)
             .NotNull()

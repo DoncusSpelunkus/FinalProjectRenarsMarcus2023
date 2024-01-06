@@ -50,6 +50,13 @@ public class ProductLocationService : IProductLocationService
             throw new ApplicationException("something went wring caused by : " + validationResult);
         }
 
+        var productLocation = await _productLocationRepository.GetProductLocationAsync(actionDto.SourcePLocationId);
+
+        if (productLocation.Quantity + actionDto.Quantity < 0)
+        {
+            throw new ApplicationException("Quantity can not be less than 0");
+        }
+
         await _productLocationRepository.ChangeQuantity(actionDto.SourcePLocationId, actionDto.Quantity);
 
         await MakeLog(actionDto, "ChangeQuantity");
@@ -66,13 +73,13 @@ public class ProductLocationService : IProductLocationService
             throw new ApplicationException("something went wring caused by : " + validationResult);
         }
 
-        if (actionDto.Type == RoleEnum.MoveToNewLocation)
+        if (actionDto.Type == ActionEnum.MoveToNewLocation)
         {
             var productLocation = _mapper.Map<ProductLocation>(actionDto);
 
             await _productLocationRepository.MoveToNewLocationAsync(productLocation, actionDto.SourcePLocationId);
         }
-        else if (actionDto.Type == RoleEnum.MoveToExistingLocation)
+        else if (actionDto.Type == ActionEnum.MoveToExistingLocation)
         {
             await _productLocationRepository.MoveToExistingLocationAsync(actionDto.SourcePLocationId, actionDto.DestinationPLocationId, actionDto.Quantity);
         }
@@ -122,7 +129,6 @@ public class ProductLocationService : IProductLocationService
     public async Task<bool> DeleteLogsOlderThanOneYearAsync()
     {
         var success = await _logRepository.DeleteLogsOlderThanOneYearAsync();
-        Console.WriteLine(success);
         return success;
     }
 

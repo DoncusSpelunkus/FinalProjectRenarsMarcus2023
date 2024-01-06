@@ -9,27 +9,28 @@ using Application.IServices;
 using Application.Validators;
 using AutoMapper;
 using Core.Entities;
+using FluentValidation;
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 
 namespace Application.Services;
 
 public class EmployeeService : IEmployeeService
 {
-    private readonly LoginValidator _loginVal;
-    private readonly PasswordValidator _passwordVal;
-    private readonly UserDtoValidator _userDtoVal;
+    private readonly AbstractValidator<LoginDto> _loginVal;
+    private readonly AbstractValidator<string> _passwordVal;
+    private readonly AbstractValidator<UserDto> _userDtoVal;
     private readonly IEmployeeRepository _employeeRepository;
     private readonly ITokenService _tokenService;
     private readonly IMapper _mapper;
     private readonly IEmailService _emailService;
 
-    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper,IEmailService emailService)
+    public EmployeeService(IEmployeeRepository employeeRepository, ITokenService tokenService, IMapper mapper,IEmailService emailService, AbstractValidator<string> passwordValidator, AbstractValidator<UserDto> userDtoValidator, AbstractValidator<LoginDto> loginValidator)
     {
         _employeeRepository = employeeRepository;
         _tokenService = tokenService;
-        _loginVal = new LoginValidator();
-        _passwordVal = new PasswordValidator();
-        _userDtoVal =  new UserDtoValidator();
+        _loginVal = loginValidator;
+        _passwordVal = passwordValidator;
+        _userDtoVal =  userDtoValidator;
         _mapper = mapper;
         _emailService = emailService;
     }
@@ -44,23 +45,20 @@ public class EmployeeService : IEmployeeService
         var validation = _userDtoVal.Validate(userDto);
 
         if(!validation.IsValid){
-            Console.WriteLine(validation.ToString());
             throw new ApplicationException("Invalid user data: " + validation);
         }
         
-
         Console.WriteLine("About to send");
 
         var password = userDto.Password ?? getRandomPassword(); // Allows us to still manually set the password for testing purposes
         
         string email = "renarsmednieks13@gmail.com";
         
-        // _emailService.SendTemporaryCredentials(email,password); 
+        _emailService.SendTemporaryCredentials(email,password); 
 
         var passwordValidation = _passwordVal.Validate(password);
 
         if(!passwordValidation.IsValid){
-            Console.WriteLine(passwordValidation.ToString());
             throw new ApplicationException("Invalid user data: " + passwordValidation);
         }
 

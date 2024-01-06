@@ -17,12 +17,11 @@ public class ProductLocationRepository : IProductLocationRepository
 
     public async Task<List<ProductLocation>> GetProductLocationsByWarehouseAsync(int warehouseId)
     {
-
         return await _context.ProductLocations
             .Where(pl => pl.WarehouseId == warehouseId)
             .Include(pl => pl.Product)  // Include the Product related entity
             .Include(pl => pl.Location) // Include the Location related entity
-            .ToListAsync();
+            .ToListAsync() ?? throw new ApplicationException("Source location does not exist");
     }
 
 
@@ -42,16 +41,11 @@ public class ProductLocationRepository : IProductLocationRepository
 
         try
         {
-            Console.WriteLine(_context.Entry(productLocation).State);
             await _context.SaveChangesAsync();
         }
         catch (DbUpdateException ex)
         {
-
             var innerException = ex.InnerException;
-
-            Console.WriteLine(innerException);
-            Console.WriteLine(innerException?.Message);
         }
 
     }
