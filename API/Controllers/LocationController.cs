@@ -1,8 +1,5 @@
-using System.Threading.Tasks;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
-using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -47,7 +44,6 @@ public class LocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in GetLocationsByWarehouse" + e);
             return BadRequest(e.Message);
         }
     }
@@ -74,7 +70,6 @@ public class LocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CreateLocation" + e);
             return BadRequest(e.Message);
         }
     }
@@ -101,7 +96,6 @@ public class LocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in UpdateLocation" + e);
             return BadRequest(e.Message);
         }
     }
@@ -127,7 +121,6 @@ public class LocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in DeleteEmployee" + e);
             return BadRequest(e.Message);
         }
     }
@@ -154,15 +147,21 @@ public class LocationController : ControllerBase
 
         }
         catch(Exception e) {
-            Console.WriteLine("Error in DeleteEmployee" + e);
             return BadRequest(e.Message);
         }
     }
     
     private async Task TriggerGetAllLocations(int warehouseId)
     {
-        var data = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
-        await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("LocationListUpdate", data);
+        try
+        {
+            var data = await _locationService.GetLocationsByWarehouseAsync(warehouseId);
+            await _hubContext.Clients.Group(warehouseId.ToString() + " InventoryManagement").SendAsync("LocationListUpdate", data);
+        }
+        catch (Exception e)
+        {
+            throw new ApplicationException(e.Message);
+        }
 
     }
 
@@ -175,7 +174,7 @@ public class LocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+            throw new ApplicationException(e.Message);
         }
         
         return dto;

@@ -6,7 +6,6 @@ using Application.InfraInterfaces;
 using Core.Entities;
 using Infrastructure.Contexts;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
 using ApplicationException = System.ApplicationException;
 
 namespace Infrastructure.Repos;
@@ -31,15 +30,17 @@ public class EmployeeRepository : IEmployeeRepository
 
     public async Task<List<Employee>> GetEmployeesByWarehouseId(int warehouseId)
     {
-        try{
+        try
+        {
 
             return await _context.Employees
                 .Where(e => e.WarehouseId == warehouseId)
                 .ToListAsync();
 
-        }catch(Exception e){
-            Console.WriteLine(e);
-            throw new ApplicationException("Something went wrong while fetching employees");
+        }
+        catch (Exception e)
+        {
+            throw new ApplicationException(e.Message);
         }
     }
 
@@ -117,8 +118,8 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+
+                throw new ApplicationException(ex.Message);
             }
             try
             {
@@ -142,8 +143,7 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+                throw new ApplicationException(ex.Message);
             }
             try
             {
@@ -162,8 +162,7 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+                throw new ApplicationException(ex.Message);
             }
             try
             {
@@ -182,8 +181,7 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+                throw new ApplicationException(ex.Message);
             }
             try
             {
@@ -202,8 +200,7 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+                throw new ApplicationException(ex.Message);
             }
             try
             {
@@ -222,14 +219,14 @@ public class EmployeeRepository : IEmployeeRepository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
-                throw new ApplicationException("something went wrong while seeding ");
+
+                throw new ApplicationException(ex.Message);
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex);
-            throw new ApplicationException("something went wrong while seeding ");
+
+            throw new ApplicationException(ex.Message);
         }
     }
 

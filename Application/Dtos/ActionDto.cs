@@ -11,6 +11,6 @@ namespace Application.Dtos
         public string? DestinationPLocationId { get; set; }
         public int Quantity { get; set; }
         public int WarehouseId { get; set; }
-        public ActionEnum Type { get; set; } // Fix: Make RoleEnum public
+        public ActionEnum Type { get; set; }
     }
 }

@@ -35,18 +35,6 @@ namespace Application.Services;
         var products = await _productRepository.GetProductsByWarehouseAsync(warehouseId);
         return _mapper.Map<List<ProductDto>>(products);
         
-        // an example using linq build in sorting algorithm 
-        /*
-         *   bool sortByNameAscending = true;
-            var products = await _productRepository.GetProductsByWarehouseAsync(warehouseId);
-   
-            var productDtos = _mapper.Map<List<ProductDto>>(products);
-
-            var sorter = new ObjectSorter<ProductDto>();
-            var sortedProducts = sorter.SortByProperty(productDtos, "Name", sortByNameAscending);
-
-            return sortedProducts;
-         */
     }
 
     public async Task<ProductDto> CreateProductAsync(ProductDto productDto)

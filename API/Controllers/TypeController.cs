@@ -1,12 +1,10 @@
-using System.Threading.Tasks;
 using Application.Dtos;
 using Application.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Application.Services;
 using sockets;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
 
 namespace API.Controllers;
 
@@ -127,7 +125,7 @@ public class TypeController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllShipments" + e);
+            throw new ApplicationException(e.Message);
         }
     }
     private TypeDto CrossMethodUserClaimExtractor(TypeDto dto, HttpContext httpContext)
@@ -139,12 +137,12 @@ public class TypeController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+            throw new ApplicationException(e.Message);
         }
 
         return dto;
     }
-    
+
     [Authorize(Roles = "admin")]
     [HttpPut("Update")]
     public async Task<ActionResult<TypeDto>> UpdateType(TypeDto typeDto)
@@ -164,7 +162,6 @@ public class TypeController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in UpdateType" + e);
             return BadRequest(e.Message);
         }
     }

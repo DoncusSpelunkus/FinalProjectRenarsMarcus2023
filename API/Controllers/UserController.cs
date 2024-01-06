@@ -1,10 +1,6 @@
-﻿using System.Threading.Tasks;
-using API.Helpers;
-using Application.Dtos;
+﻿using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using sockets;
@@ -56,7 +52,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in register" + e);
             return BadRequest(e.Message);
         }
     }
@@ -81,7 +76,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in login" + e);
             return BadRequest(e.Message);
         }
     }
@@ -105,7 +99,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in GetAllByWareHouseId" + e);
             return BadRequest(e.Message);
         }
     }
@@ -127,7 +120,7 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in GetEmployeeById" + e);
+
             return BadRequest(e.Message);
         }
     }
@@ -157,7 +150,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in UpdateEmployee" + e);
             return BadRequest(e.Message);
         }
     }
@@ -184,7 +176,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in DeleteEmployee" + e);
             return BadRequest(e.Message);
         }
     }
@@ -208,7 +199,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in PasswordUpdate" + e);
             return BadRequest(e.Message);
         }
     }
@@ -229,7 +219,6 @@ public class UserController : ControllerBase
          }
          catch (Exception e)
          {
-             Console.WriteLine("Error in ResetPassword" + e);
              return BadRequest(e.Message);
          }
      }
@@ -245,7 +234,6 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in contacting support" + e);
             return BadRequest(e.Message);
         }
     }
@@ -266,7 +254,7 @@ public class UserController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllProductLocations" + e);
+             throw new ApplicationException(e.Message);
         }
     }
 }

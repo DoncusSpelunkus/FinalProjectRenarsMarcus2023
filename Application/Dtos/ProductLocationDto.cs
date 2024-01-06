@@ -1,6 +1,4 @@
-﻿using Core.Entities;
-
-namespace Application.Dtos;
+﻿namespace Application.Dtos;
 
 public class ProductLocationDto
 {

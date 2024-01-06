@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using API.Helpers;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -137,7 +135,7 @@ public class ProductLocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllProductLocations" + e);
+            throw new ApplicationException(e.Message);
         }
     }
 
@@ -154,7 +152,7 @@ public class ProductLocationController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+            throw new ApplicationException(e.Message);
         }
         return actionDto;
     }

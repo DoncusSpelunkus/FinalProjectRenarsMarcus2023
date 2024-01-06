@@ -1,6 +1,5 @@
 ﻿
 using Application.InfraInterfaces;
-using Application.IServices;
 using Infrastructure.Repos;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,7 +18,5 @@ public static class DependencyResolverService
         serviceCollection.AddScoped<IBrandRepository, BrandRepository>();
         serviceCollection.AddScoped<ITypeRepository, TypeRepository>();
         serviceCollection.AddScoped<ILogRepository, LogRepository>();
-        serviceCollection.AddScoped<ITimeMapRepository, TimeMapRepository>();
-
     }
 }

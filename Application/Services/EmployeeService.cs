@@ -1,16 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
+﻿
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using Application.Dtos;
 using Application.InfraInterfaces;
 using Application.IServices;
-using Application.Validators;
 using AutoMapper;
 using Core.Entities;
 using FluentValidation;
-using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+
 
 namespace Application.Services;
 
@@ -48,8 +45,6 @@ public class EmployeeService : IEmployeeService
             throw new ApplicationException("Invalid user data: " + validation);
         }
         
-        Console.WriteLine("About to send");
-
         var password = userDto.Password ?? getRandomPassword(); // Allows us to still manually set the password for testing purposes
         
         string email = "renarsmednieks13@gmail.com";
@@ -115,7 +110,7 @@ public class EmployeeService : IEmployeeService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+       
             throw new ApplicationException("Employee not found");
         }
     }
@@ -178,7 +173,7 @@ public class EmployeeService : IEmployeeService
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+
             throw new ApplicationException("Error updating password");
         }
         return true;
@@ -193,7 +188,6 @@ public class EmployeeService : IEmployeeService
         _emailService.SendTemporaryCredentials(email, newPassword); 
 
         var hashAndSalt = CreatePasswordHash(newPassword);
-        Console.WriteLine("Hash and salt: " + hashAndSalt.Hash + " " + hashAndSalt.Salt);
         employee.PasswordHash = hashAndSalt.Hash;
         employee.PasswordSalt = hashAndSalt.Salt;
 

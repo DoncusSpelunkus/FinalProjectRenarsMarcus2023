@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
 using Application.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Application.Services;
 using Application.IServices;
 using sockets;
 using Microsoft.AspNetCore.SignalR;
@@ -205,7 +203,7 @@ public class ShipmentController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllProductLocations" + e);
+           
         }
     }
 
@@ -221,7 +219,7 @@ public class ShipmentController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+            throw new ApplicationException(e.Message);
         }
 
         return dto;

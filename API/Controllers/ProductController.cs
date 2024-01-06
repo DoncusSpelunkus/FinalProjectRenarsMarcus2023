@@ -1,7 +1,5 @@
-using System.Threading.Tasks;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -48,7 +46,7 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<List<ProductDto>>> GetProductsByWarehouse()
     {
 
-        var userWarehouseIdClaim  = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+        var userWarehouseIdClaim = int.Parse(HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
 
         try
         {
@@ -82,9 +80,9 @@ public class ProductController : ControllerBase
                 return BadRequest("Product already exists");
             }
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
-            
-            await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));    
+            var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+
+            await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
 
             return product;
         }
@@ -109,10 +107,10 @@ public class ProductController : ControllerBase
                 return BadRequest("Product does not exist");
             }
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+            var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
             await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
-            
+
             return product;
         }
         catch (Exception e)
@@ -134,7 +132,7 @@ public class ProductController : ControllerBase
                 return BadRequest("Product does not exist");
             }
 
-            var userWarehouseIdClaim  = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
+            var userWarehouseIdClaim = HttpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId");
 
             await TriggerGetAllProducts(int.Parse(userWarehouseIdClaim!.Value));
 
@@ -146,7 +144,7 @@ public class ProductController : ControllerBase
         }
     }
 
-    
+
     private async Task TriggerGetAllProducts(int warehouseId)
     {
         try
@@ -156,7 +154,7 @@ public class ProductController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllProducts" + e);
+            throw new ApplicationException(e.Message);
         }
 
     }
@@ -164,12 +162,14 @@ public class ProductController : ControllerBase
     private ProductDto CrossMethodUserClaimExtractor(ProductDto dto, HttpContext httpContext)
     {
 
-        try{
-            var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
+        try
+        {
+            var userWarehouseIdClaim = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId")!.Value);
             dto.WarehouseId = userWarehouseIdClaim;
         }
-        catch(Exception e){
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+        catch (Exception e)
+        {
+            throw new ApplicationException(e.Message);
         }
 
         return dto;
