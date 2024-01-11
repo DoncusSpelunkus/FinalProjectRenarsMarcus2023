@@ -1,9 +1,6 @@
-﻿using System.Reflection;
-using Application.helpers;
-using Core.Entities;
+﻿using Core.Entities;
 using Infrastructure.helpers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 
@@ -158,17 +155,6 @@ public class DbContextManagement : DbContext
             .IsRequired();
         // PRODUCT TYPE
 
-        // TIME MAP
-        modelBuilder.Entity<TimeMap>()
-            .HasKey(tm => tm.TimeMapId);
-
-        modelBuilder.Entity<TimeMap>()
-            .HasOne(tm => tm.Employee)
-            .WithMany()
-            .HasForeignKey(tm => tm.EmployeeId)
-            .IsRequired();
-        // TIME MAP
-
         // modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
         // we can customize this later 
     }
@@ -184,6 +170,5 @@ public class DbContextManagement : DbContext
     public DbSet<ProductLocation> ProductLocations { get; set; }
     public DbSet<Shipment> Shipments { get; set; }
     public DbSet<ShipmentDetail> ShipmentDetails { get; set; }
-    public DbSet<TimeMap> TimeMaps { get; set; }
 
 }

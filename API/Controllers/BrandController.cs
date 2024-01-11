@@ -1,8 +1,5 @@
-using System.Threading.Tasks;
-using API.Helpers;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
@@ -115,7 +112,6 @@ public class BrandController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in GetBrandById" + e);
             return BadRequest(e.Message);
         }
 
@@ -141,7 +137,6 @@ public class BrandController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in UpdateBrand" + e);
             return BadRequest(e.Message);
         }
     }
@@ -163,7 +158,7 @@ public class BrandController : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in TriggerGetAllShipments" + e);
+            throw new ApplicationException(e.Message);
         }
     }
 
@@ -174,7 +169,7 @@ public class BrandController : ControllerBase
             dto.WarehouseId = userWarehouseIdClaim;
         }
         catch(Exception e){
-            Console.WriteLine("Error in CrossMethodUserClaimExtractor" + e);
+             throw new ApplicationException(e.Message);
         }
 
         return dto;

@@ -70,6 +70,8 @@ public class ProductLocationTests
             productLocationRepositoryMock.Verify(repo => repo.ChangeQuantity(It.IsAny<string>(), It.IsAny<int>()), Times.Once);
         }
 
+        productLocationRepositoryMock.Verify(repo => repo.GetProductLocationAsync(It.IsAny<string>()), Times.Once);
+
     }
 
 

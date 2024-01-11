@@ -1,7 +1,5 @@
- using System.Threading.Tasks;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,7 +36,6 @@ public class WarehouseController : ControllerBase{
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in CreateWarehouse" + e);
             return BadRequest(e.Message);
         }
     }
@@ -60,7 +57,6 @@ public class WarehouseController : ControllerBase{
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in UpdateWarehouse" + e);
             return BadRequest(e.Message);
         }
     }
@@ -82,21 +78,9 @@ public class WarehouseController : ControllerBase{
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in DeleteWarehouse" + e);
             return BadRequest(e.Message);
         }
     }
-
-    /* private ActionDto CrossMethodUserClaimExtractor(WarehouseDto dto, HttpContext httpContext) // for later dev
-    {
-        var userIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "id").Value!);
-        var userWarehouseIdClaim  = int.Parse(httpContext.User.Claims.FirstOrDefault(x => x.Type == "warehouseId").Value!);
-
-        dto.WarehouseId = userWarehouseIdClaim;
-        dto.EmployeeId = userIdClaim;
-
-        return dto;
-    } */
 }
  
  

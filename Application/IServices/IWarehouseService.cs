@@ -1,5 +1,4 @@
 using Application.Dtos;
-using Core.Entities;
 
 namespace Application.IServices;
 public interface IWarehouseService

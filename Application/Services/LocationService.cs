@@ -1,12 +1,9 @@
 ﻿using Application.Dtos;
-using Application.ErrorHandler;
 using Application.InfraInterfaces;
 using Application.IServices;
 using AutoMapper;
 using Core.Entities;
 using FluentValidation;
-using iText.Layout.Element;
-using Microsoft.AspNetCore.Http.Features;
 using ApplicationException = Application.ErrorHandler.ApplicationException;
 
 namespace Application.Services;

@@ -1,13 +1,7 @@
-using System.Threading.Tasks;
 using Application.Dtos;
 using Application.IServices;
-using Application.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using sockets;
-
-
 
 namespace API.Controllers;
 
@@ -46,7 +40,6 @@ public class Logscontroller : ControllerBase
         }
         catch (Exception e)
         {
-            Console.WriteLine("Error in GetLog" + e);
             return BadRequest(e.Message);
         }
     }

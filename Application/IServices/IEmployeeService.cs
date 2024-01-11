@@ -1,6 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿
 using Application.Dtos;
-using Core.Entities;
 
 namespace Application.IServices;
 
